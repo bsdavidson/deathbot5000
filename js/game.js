@@ -367,8 +367,10 @@ Game.prototype.draw = function(elapsedTime) {
     }, this);
     this.drawScore();
     if (this.gameState === 'attract') {
-        this.showMessage('Berzerk', 140, 45);
-        this.showMessage('Press Space to Begin', 180);
+        this.showMessage('Deathbot 5000', 120);
+        this.showMessage('WASD to Shoot', 180);
+        this.showMessage('Arrow Keys to Move', 220);
+        this.showMessage('Press Space to Begin', 260);
     }
     if (this.gameState === 'dead') {
         this.showMessage('Thou art ' + this.playerDeathMethod);
