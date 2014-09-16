@@ -101,6 +101,13 @@ var Game = Berzerk.Game = function(canvasSelector, fillStyle) {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d');
+
+    this.canvasFX = document.querySelector('#fx');
+    this.canvasFX.width = window.innerWidth;
+    this.canvasFX.height = window.innerHeight;
+    this.contextFX = this.canvasFX.getContext('2d');
+    this.contextFX.fillStyle = 'rgba(0, 0, 0, .50)';
+    this.contextFX.fillRect(0, 0, this.canvasFX.width, this.canvasFX.height);
 };
 
 Game.prototype.createSpawnPoints = function(actorWidth, actorHeight) {
@@ -362,6 +369,11 @@ Game.prototype.drawBackground = function(elapsedTime) {
 
 Game.prototype.draw = function(elapsedTime) {
     this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
+
+    this.contextFX.clearRect(0,0,this.canvas.width, this.canvas.height);
+    this.contextFX.fillStyle = 'rgba(0, 0, 0, .10)';
+    this.contextFX.fillRect(0, 0, this.canvasFX.width, this.canvasFX.height);
+
     this.eachActor(function(actor) {
         actor.draw(this, elapsedTime);
     }, this);

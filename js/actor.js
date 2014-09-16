@@ -98,24 +98,37 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
         if (game.gameState !== 'play') {
             return;
         }
-
-        var visible = false;
-        var inFOV = (
-            (this.dirX === 1 && (this.curX + this.width) < actor.curX) ||
-            (this.dirX === -1 && this.curX > (actor.curX + actor.width)) ||
-            (this.dirY === -1 && this.curY > (actor.curY + actor.height)) ||
-            (this.dirY === 1 && this.curY + this.height < actor.curY)
-            );
-
-        if (inFOV) {
-            var visionStart = {
+        var visionStart = {
                 x: this.curX + (this.width / 2) + this.eyeOffset.x,
                 y: this.curY + this.eyeOffset.y
             };
-            var visionDelta = {
+        var visionDelta = {
                 x: (actor.curX + (actor.width / 2) + actor.eyeOffset.x) - visionStart.x,
                 y: (actor.curY + actor.eyeOffset.y) - visionStart.y
-            };
+        };
+        var actorDirLength = Math.sqrt(visionDelta.x * visionDelta.x + visionDelta.y * visionDelta.y);
+        var actorDir = {};
+            actorDir.x = visionDelta.x / actorDirLength;
+            actorDir.y = visionDelta.y / actorDirLength;
+        var dotProduct = (this.dirX * actorDir.x) + (this.dirY * actorDir.y);
+
+        var visible = false;
+
+        // var inFOV = (
+        //     (this.dirX === 1 && (this.curX + this.width) < actor.curX) ||
+        //     (this.dirX === -1 && this.curX > (actor.curX + actor.width)) ||
+        //     (this.dirY === -1 && this.curY > (actor.curY + actor.height)) ||
+        //     (this.dirY === 1 && this.curY + this.height < actor.curY)
+        //     );
+        var inFOV;
+        if (dotProduct > 0.70){
+            inFOV = true;
+        } else {
+            inFOV = false;
+        }
+
+        if (inFOV) {
+        console.log('In my sight');
             var actorArr = [];
             var actorObj = {
                 x: actor.curX,
@@ -227,6 +240,8 @@ Actor.prototype.draw = function(game, elapsedTime) {
         game.context.drawImage(this.curImage, this.curX, this.curY,
             this.width, this.height);
     }
+
+    game.contextFX.clearRect(this.curX - (this.width / 2), this.curY - (this.height /2), this.width * 2, this.height * 2 );
 
     if (game.debugMode) {
         var x1 = this.curX;

@@ -29,3 +29,13 @@ html, body {
     border:0px solid #222;
     z-index:20;
 }
+
+#fx {
+    position: absolute;
+    top:0px;
+    margin: 0 auto;
+    left:0;
+    right:0;
+    border:0px solid #222;
+    z-index:30;
+}
