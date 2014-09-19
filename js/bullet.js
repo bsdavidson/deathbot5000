@@ -1,7 +1,8 @@
-(function(Berzerk) {
-"use strict";
+/*jshint browser:true */
 
-//image, startX, startY, scale, speedX, speedY, dirX, dirY
+(function(Berzerk) {
+'use strict';
+
 var Bullet = Berzerk.Bullet = function Bullet(startX, startY, speed, dirX, dirY) {
     var image = {w: 5, h: 5};
     Berzerk.Actor.call(this, image, startX, startY, 100, speed, speed, dirX, dirY);

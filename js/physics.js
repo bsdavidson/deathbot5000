@@ -1,5 +1,7 @@
+/*jshint browser:true */
+
 (function (Berzerk) {
-"use strict";
+'use strict';
 
 var Physics = Berzerk.Physics = function Physics(game) {
     this.game = game;

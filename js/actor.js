@@ -1,5 +1,7 @@
+/*jshint browser:true */
+
 (function(Berzerk) {
-"use strict";
+'use strict';
 
 var Actor = Berzerk.Actor = function Actor(image, startX, startY, scale, speedX, speedY, dirX, dirY) {
     if (arguments.length === 0) {
@@ -146,7 +148,7 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
             } else if (actorResult && actorResult.hit) {
                 visible = true;
             } else {
-                visible.false;
+                visible = false;
             }
         }
         if (visible) {

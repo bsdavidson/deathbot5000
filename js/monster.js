@@ -1,5 +1,7 @@
+/*jshint browser:true */
+
 (function(Berzerk) {
-"use strict";
+'use strict';
 
 var Monster = Berzerk.Monster = function Monster(image, startX, startY, scale, speedX, speedY, dirX) {
     Berzerk.Actor.apply(this, arguments);
