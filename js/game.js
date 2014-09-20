@@ -172,7 +172,7 @@ Game.prototype.calcGridXY = function(gridIndex) {
     return result;
 };
 
-Game.prototype.drawGrid = function(grid) {
+Game.prototype.drawGrid = function(grid, debug, color) {
     var gridPosX = 0, gridPosY = 0;
     for (var row = 0; row < this.rows; row++) {
         for (var col = 0; col < this.cols; col++) {
@@ -192,7 +192,19 @@ Game.prototype.drawGrid = function(grid) {
                 this.contextBG.strokeStyle = 'red';
                 this.contextBG.strokeRect(gridPosX, gridPosY, this.cellWidth, this.cellHeight);
             }
+            if (debug === 'debug') {
+                this.contextFX.strokeStyle = color;
+                this.contextFX.strokeRect(gridPosX, gridPosY, this.cellWidth, this.cellHeight);
+            }
+
         }
+    }
+};
+
+Game.prototype.drawStaticTiles = function(game, staticArray, color) {
+    for (var i = 0, li = staticArray.length; i < li; i++) {
+         this.contextFX.strokeStyle = color;
+         this.contextFX.strokeRect(staticArray[i].x, staticArray[i].y, staticArray[i].w, staticArray[i].h);
     }
 };
 
@@ -369,10 +381,9 @@ Game.prototype.drawBackground = function(elapsedTime) {
 
 Game.prototype.draw = function(elapsedTime) {
     this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
-
     this.contextFX.clearRect(0,0,this.canvas.width, this.canvas.height);
-    this.contextFX.fillStyle = 'rgba(0, 0, 0, .90)';
-    this.contextFX.fillRect(0, 0, this.canvasFX.width, this.canvasFX.height);
+    // this.contextFX.fillStyle = 'rgba(0, 0, 0, .90)';
+    // this.contextFX.fillRect(0, 0, this.canvasFX.width, this.canvasFX.height);
 
     this.eachActor(function(actor) {
         actor.draw(this, elapsedTime);

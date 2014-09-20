@@ -32,6 +32,7 @@ var Actor = Berzerk.Actor = function Actor(image, startX, startY, scale, speedX,
     this.facing = 'right';
     this.dirX = dirX;
     this.dirY = dirY;
+    this.previousDir = {x: this.dirX, y: this.dirY};
     this.startX = startX;
     this.startY = startY;
     this.width = this.orgWidth * (scale / 100);
@@ -39,6 +40,7 @@ var Actor = Berzerk.Actor = function Actor(image, startX, startY, scale, speedX,
     this.curX = startX;
     this.curY = startY;
     this.previousPos = {x: this.curX, y: this.curY};
+    this.tilesInFOV = [];
     this.speedX = speedX;
     this.speedY = speedY;
     this.moving = true;
@@ -92,7 +94,7 @@ Actor.prototype.eachOverlappingActor = function(game, actorConstructor, callback
 
 
 Actor.prototype.getTilesInFOV = function(game) {
-    var tilesInFOV = [];
+    this.tilesInFOV = [];
     var blocks = game.staticBlocks;
     for (var i = 0, li = blocks.length; i < li; i++) {
         var visionDelta = {
@@ -104,12 +106,12 @@ Actor.prototype.getTilesInFOV = function(game) {
             blockDir.x = visionDelta.x / blockDirLength;
             blockDir.y = visionDelta.y / blockDirLength;
         var dotProduct = (this.dirX * blockDir.x) + (this.dirY * blockDir.y);
-        if (dotProduct > 0.60){
-            tilesInFOV.push(game.staticBlocks[i]);
+        if (dotProduct > 0.70){
+            this.tilesInFOV.push(game.staticBlocks[i]);
         }
     }
-    return tilesInFOV;
 };
+
 
 Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
      game.eachActor(function(actor) {
@@ -135,12 +137,6 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
 
         var visible = false;
 
-        // var inFOV = (
-        //     (this.dirX === 1 && (this.curX + this.width) < actor.curX) ||
-        //     (this.dirX === -1 && this.curX > (actor.curX + actor.width)) ||
-        //     (this.dirY === -1 && this.curY > (actor.curY + actor.height)) ||
-        //     (this.dirY === 1 && this.curY + this.height < actor.curY)
-        //     );
         var inFOV;
         if (dotProduct > 0.70){
             inFOV = true;
@@ -149,8 +145,6 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
         }
 
         if (inFOV) {
-        //console.log('In my sight');
-            var blocksInFov = this.getTilesInFOV(game);
             var actorArr = [];
             var actorObj = {
                 x: actor.curX,
@@ -159,7 +153,7 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
                 h: actor.height
             };
             actorArr.push(actorObj);
-            var blockResult = game.physics.intersectSegmentIntoBoxes(visionStart, visionDelta, blocksInFov);
+            var blockResult = game.physics.intersectSegmentIntoBoxes(visionStart, visionDelta, game.staticBlocks);
             var actorResult = game.physics.intersectSegmentIntoBoxes(visionStart, visionDelta, actorArr);
 
             if (game.debugMode) {
@@ -199,7 +193,7 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
     startingPoint.x = this.curX + (this.width / 2);
     startingPoint.y = this.curY + 14;
 
-    var tilesInFOV = this.getTilesInFOV(game);
+    this.getTilesInFOV(game);
     var initialEndpoint = {};
 
     // Get our initial point that is straight ahead
@@ -220,7 +214,7 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
     var degreeToEndSweep = degToInitialEndpos + sweepAngle;
     initalDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
     var initialResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
-                                         initalDelta, tilesInFOV);
+                                         initalDelta, this.tilesInFOV);
     var intialEndPos;
     if (initialResult && initialResult.hit) {
             // update end pos with hit pos
@@ -238,7 +232,7 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
         degreeToCurEndPoint += 1;
         var endingDelta = game.physics.degToPos(degreeToCurEndPoint, this.laserRange);
         var endingResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
-                                             endingDelta, tilesInFOV);
+                                             endingDelta, this.tilesInFOV);
 
         if (endingResult && endingResult.hit) {
             // update end pos with hit pos
@@ -331,8 +325,6 @@ Actor.prototype.draw = function(game, elapsedTime) {
         game.context.drawImage(this.curImage, this.curX, this.curY,
             this.width, this.height);
     }
-
-    // game.contextFX.clearRect(this.curX - (this.width / 2), this.curY - (this.height /2), this.width * 2, this.height * 2 );
 
     this.headLamp(game, elapsedTime);
 
