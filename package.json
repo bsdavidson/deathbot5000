@@ -1,0 +1,23 @@
+{
+  "name": "deathbot5000",
+  "version": "0.0.0",
+  "description": "Thou art dead.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bsdavidson/deathbot5000.git"
+  },
+  "author": "Brian Davidson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bsdavidson/deathbot5000/issues"
+  },
+  "homepage": "https://github.com/bsdavidson/deathbot5000",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}

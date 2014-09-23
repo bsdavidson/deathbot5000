@@ -1,5 +1,7 @@
+/*jshint browser:true */
+
 (function() {
-"use strict";
+'use strict';
 
 var Berzerk = window.Berzerk = {};
 

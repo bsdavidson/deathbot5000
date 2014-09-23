@@ -1,5 +1,7 @@
+/*jshint browser:true */
+
 (function(Berzerk) {
-"use strict";
+'use strict';
 
 var KEY_UP = 38;
 var KEY_DOWN = 40;
