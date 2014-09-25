@@ -10,8 +10,6 @@ Berzerk.DIR_DOWN = 1;
 Berzerk.DIR_LEFT = 2;
 Berzerk.DIR_RIGHT = 3;
 Berzerk.EPSILON = 1 / 32;
-Berzerk.INF = 2600;
-Berzerk.DEBUG_TILE = 9;
 
 Berzerk.directions = [
     {x: 0, y: -1},
@@ -41,8 +39,10 @@ window.addEventListener('load', function() {
     // though they don't look like they exist at this point, they will by the
     // time the window load event has fired.
 
-    var game = new Berzerk.Game('#berzerk', 'orange');
-    window.berzerkGame = game;
+    var canvas = document.querySelector('#berzerk');
+    var canvasBG = document.querySelector('#background');
+    var game = window.berzerkGame = new Berzerk.Game(canvas, canvasBG, 'orange');
+    game.loadImages();
 
     window.addEventListener('keydown', function(event) {
         game.onKeyDown(event);
@@ -56,11 +56,8 @@ window.addEventListener('load', function() {
         game.onMouseMove(event);
     });
 
-    game.loadImages();
-
     var blurred = false;
-    var framesPerSecond;
-    var updateFramesPerSecond = function(event) {
+    var setFocus = function(event) {
         if (event) {
             if (event.type === 'blur') {
                 blurred = true;
@@ -68,40 +65,32 @@ window.addEventListener('load', function() {
                 blurred = false;
             }
         }
-        if (game.debugMode && (document.hidden || blurred)) {
-            framesPerSecond = 1;
-        } else {
-            framesPerSecond = 30;
-        }
+        game.setFocus(event, document.hidden || blurred);
     };
+    setFocus();
+    window.addEventListener('blur', setFocus, true);
+    window.addEventListener('focus', setFocus, true);
+    window.addEventListener('visibilitychange', setFocus, true);
 
-    updateFramesPerSecond();
-    window.addEventListener('blur', updateFramesPerSecond, true);
-    window.addEventListener('focus', updateFramesPerSecond, true);
-    window.addEventListener('visibilitychange', updateFramesPerSecond, true);
-
-    window.onresize = function(){
-        window.setTimeout(game.resize(), 1000);
+    var resizeTimeout;
+    window.onresize = function(event) {
+        if (resizeTimeout) {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = null;
+        }
+        resizeTimeout = setTimeout(function() {
+            resizeTimeout = null;
+            game.onResize(event);
+        }, 1000);
     };
 
     var oldFrameTime = (new Date().getTime() / 1000);
-
     var tick = function() {
         var newFrameTime = (new Date().getTime() / 1000);
         var elapsedTime = newFrameTime - oldFrameTime;
         oldFrameTime = newFrameTime;
-        game.cumulativeTime += elapsedTime;
-        if (game.imagesLoaded) {
-            if(!game.initialized) {
-                game.drawBackground(elapsedTime);
-                game.initialize(elapsedTime);
-            }
-            game.draw(elapsedTime);
-            game.update(elapsedTime);
-        } else {
-            game.gameLoading();
-        }
-        setTimeout(tick, Math.floor(1000 / framesPerSecond));
+        game.tick(elapsedTime);
+        setTimeout(tick, Math.floor(1000 / game.framesPerSecond));
     };
     tick();
 });
