@@ -26,17 +26,19 @@ Monster.prototype.draw = function(game, elapsedTime) {
                 this.curX + (this.width / 4),
                 this.curY - 10);
         }
-        } else if (this.alpha >= 0.1) {
-            this.alpha -= 0.1;
-            game.context.globalAlpha = this.alpha;
-            Berzerk.Actor.prototype.draw.call(this, game, elapsedTime);
-            game.context.globalAlpha = 1;
-        }
+    } else if (this.alpha >= 0.1) {
+        this.alpha -= 0.1;
+        game.context.globalAlpha = this.alpha;
+        Berzerk.Actor.prototype.draw.call(this, game, elapsedTime);
+        game.context.globalAlpha = 1;
+    }
 };
 
 Monster.prototype.fireLaser = function(game, player) {
-    var laserEndpoint = {x: this.laserStart.x + this.laserDelta.x,
-                         y: this.laserStart.y + this.laserDelta.y};
+    var laserEndpoint = {
+        x: this.laserStart.x + this.laserDelta.x,
+        y: this.laserStart.y + this.laserDelta.y
+    };
     var target = [];
     var targetObj = {};
     targetObj.x = player.curX + 5;
@@ -44,15 +46,15 @@ Monster.prototype.fireLaser = function(game, player) {
     targetObj.w = 15;
     targetObj.h =  15;
     target.push(targetObj);
-    var targetDelta = game.physics.getDelta(this.laserStart.x, this.laserStart.y,
-                                            targetObj.x, targetObj.y);
+    var targetDelta = game.physics.getDelta(
+        this.laserStart.x, this.laserStart.y, targetObj.x, targetObj.y);
     this.firing = true;
     this.moving = false;
 
-    var blockResult = game.physics.intersectSegmentIntoBoxes(this.laserStart,
-                                         this.laserDelta, game.staticBlocks);
-    var targetResult = game.physics.intersectSegmentIntoBoxes(this.laserStart,
-                                                    this.laserDelta, target);
+    var blockResult = game.physics.intersectSegmentIntoBoxes(
+        this.laserStart, this.laserDelta, game.staticBlocks);
+    var targetResult = game.physics.intersectSegmentIntoBoxes(
+        this.laserStart, this.laserDelta, target);
 
     var endPos; var targetHit;
     if ((blockResult && blockResult.hit) && (targetResult && targetResult.hit)) {
@@ -117,11 +119,14 @@ Monster.prototype.fireLaser = function(game, player) {
 
 Monster.prototype.update = function(game, elapsedTime) {
     Berzerk.Actor.prototype.update.call(this, game, elapsedTime);
-    this.laserStart = {x: this.curX + (this.width / 2), y: this.curY + 14};
+    this.laserStart = {
+        x: this.curX + (this.width / 2),
+        y: this.curY + 14
+    };
     this.debugColor = 'red';
     this.dirTimer -= elapsedTime;
     if (this.dirTimer <= 0 && !this.firing) {
-        this.moving = game.getRandom(0, 1) ? true : false;
+        this.moving = Boolean(game.getRandom(0, 1));
         this.dirTimer = game.getRandom(2, 4);
         var nextDirection = game.getRandom(0, 3);
         this.dirX = Berzerk.directions[nextDirection].x;
@@ -134,21 +139,22 @@ Monster.prototype.update = function(game, elapsedTime) {
 
         if (!this.firing) { // set the initial starting point for the laser
             var laserEndpoint;
-                if (this.dirX === -1 || this.dirX === 1) {
-                    laserEndpoint = {x: (this.laserStart.x + this.laserRange) *
-                                        -this.dirX,
-                                     y: this.laserStart.y};
-                } else if (this.dirY === -1 || this.dirY === 1) {
-                    laserEndpoint = {x: this.laserStart.x,
-                                     y: (this.laserStart.y + this.laserRange) *
-                                        -this.dirY};
-                } else {
-                    // do nothing
-                }
-            this.laserDelta = game.physics.getDelta(laserEndpoint.x, laserEndpoint.y,
-                                          this.laserStart.x, this.laserStart.y);
+            if (this.dirX === -1 || this.dirX === 1) {
+                laserEndpoint = {
+                    x: (this.laserStart.x + this.laserRange) * -this.dirX,
+                    y: this.laserStart.y
+                };
+            } else if (this.dirY === -1 || this.dirY === 1) {
+                laserEndpoint = {
+                    x: this.laserStart.x,
+                    y: (this.laserStart.y + this.laserRange) * -this.dirY
+                };
             }
-            this.fireLaser(game, player);
+            this.laserDelta = game.physics.getDelta(
+                laserEndpoint.x, laserEndpoint.y, this.laserStart.x,
+                this.laserStart.y);
+        }
+        this.fireLaser(game, player);
     });
 
     if (this.visibleActors === 0) {
