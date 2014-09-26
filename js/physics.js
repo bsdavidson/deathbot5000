@@ -1,5 +1,7 @@
+/*jshint browser:true */
+
 (function (Berzerk) {
-"use strict";
+'use strict';
 
 var Physics = Berzerk.Physics = function Physics(game) {
     this.game = game;
@@ -54,9 +56,7 @@ Physics.prototype.drawBox = function(x, y, w, h, color) {
 };
 
 Physics.prototype.getDelta = function(x1, y1, x2, y2) {
-    var x = x2 - x1;
-    var y = y2 - y1;
-    return {x: x, y: y};
+    return {x: x2 - x1, y: y2 - y1};
 };
 
 Physics.prototype.intersectSegmentIntoBox = function(segmentPos, segmentDelta, paddedBox, debug) {
@@ -224,26 +224,23 @@ Physics.prototype.checkNearestHit = function(sourceActor, staticResult, targetRe
     if (sourceActor.dirX === -1 || sourceActor.dirX === 1) {
         if (Math.abs(sourceX - staticX) < Math.abs(sourceX - targetX)) {
             result.targetHit = false;
-            result.endPos = new Berzerk.Physics.Point(staticResult.hitPos.x,
-                                                      staticResult.hitPos.y);
+            result.endPos = new Berzerk.Physics.Point(
+                staticResult.hitPos.x, staticResult.hitPos.y);
         } else {
-            result.endPos = new Berzerk.Physics.Point(targetResult.hitPos.x,
-                                                      targetResult.hitPos.y);
+            result.endPos = new Berzerk.Physics.Point(
+                targetResult.hitPos.x, targetResult.hitPos.y);
             result.targetHit = true;
         }
-
     } else if (sourceActor.dirY === -1 || sourceActor.dirY === 1 ) {
         if (Math.abs(sourceY - staticY) < Math.abs(sourceY - targetY)) {
             result.targetHit = false;
-            result.endPos = new Berzerk.Physics.Point(staticResult.hitPos.x,
-                                                      staticResult.hitPos.y);
+            result.endPos = new Berzerk.Physics.Point(
+                staticResult.hitPos.x, staticResult.hitPos.y);
         } else {
-            result.endPos = new Berzerk.Physics.Point(targetResult.hitPos.x,
-                                                      targetResult.hitPos.y);
+            result.endPos = new Berzerk.Physics.Point(
+                targetResult.hitPos.x, targetResult.hitPos.y);
             result.targetHit = true;
         }
-    } else {
-     // Wat?
     }
     return result;
 };
@@ -260,8 +257,8 @@ Physics.prototype.getTargetDeg = function(delta) {
 Physics.prototype.degToPos = function(degree, radius) {
     var radian = degree * (Math.PI / 180);
     var result = {
-        y: radius * Math.cos(radian),
-        x: radius * Math.sin(radian)
+        x: radius * Math.sin(radian),
+        y: radius * Math.cos(radian)
     };
     return result;
 };

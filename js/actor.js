@@ -1,10 +1,14 @@
+/*jshint browser:true */
+
 (function(Berzerk) {
-"use strict";
+'use strict';
 
 var Actor = Berzerk.Actor = function Actor(image, startX, startY, scale, speedX, speedY, dirX, dirY) {
     if (arguments.length === 0) {
         return;
     }
+
+    var unscaledWidth, unscaledHeight;
     if (image) {
         this.image = image;
         this.curImage = this.image;
@@ -14,8 +18,8 @@ var Actor = Berzerk.Actor = function Actor(image, startX, startY, scale, speedX,
             up: image.up,
             down: image.down
         };
-        this.orgWidth = image.w;
-        this.orgHeight = image.h;
+        unscaledWidth = image.w;
+        unscaledHeight = image.h;
     } else {
         this.image = null;
         this.curImage = null;
@@ -25,18 +29,21 @@ var Actor = Berzerk.Actor = function Actor(image, startX, startY, scale, speedX,
             up: null,
             down: null
         };
-        this.orgWidth = 1;
-        this.orgHeight = 1;
+        unscaledWidth = 1;
+        unscaledHeight = 1;
     }
 
     this.facing = 'right';
     this.dirX = dirX;
     this.dirY = dirY;
+
     this.previousDir = {x: this.dirX, y: this.dirY};
     this.startX = startX;
     this.startY = startY;
-    this.width = this.orgWidth * (scale / 100);
-    this.height = this.orgHeight * (scale / 100);
+
+    this.width = unscaledWidth * (scale / 100);
+    this.height = unscaledHeight * (scale / 100);
+
     this.curX = startX;
     this.curY = startY;
     this.previousPos = {x: this.curX, y: this.curY};
@@ -168,14 +175,13 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
                  game.context.stroke();
             }
 
-            var targetVisible;
             if (actorResult && actorResult.hit && blockResult && blockResult.hit) {
                 var result = game.physics.checkNearestHit(this, blockResult, actorResult);
                 visible = result.targetHit;
             } else if (actorResult && actorResult.hit) {
                 visible = true;
             } else {
-                visible.false;
+                visible = false;
             }
         }
         if (visible) {
@@ -218,10 +224,12 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
     var intialEndPos;
     if (initialResult && initialResult.hit) {
             // update end pos with hit pos
-        intialEndPos = new Berzerk.Physics.Point(initialResult.hitPos.x, initialResult.hitPos.y);
+        intialEndPos = new Berzerk.Physics.Point(
+            initialResult.hitPos.x, initialResult.hitPos.y);
 
     } else {
-        intialEndPos = new Berzerk.Physics.Point(initialEndpoint.x, initialEndpoint.y);
+        intialEndPos = new Berzerk.Physics.Point(
+            initialEndpoint.x, initialEndpoint.y);
     }
 
     pointArray.push(intialEndPos);
@@ -229,10 +237,10 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
     var endingEndPos;
     degreeToCurEndPoint = degreeToStartSweep;
     while (degreeToCurEndPoint < degreeToEndSweep) {
-        degreeToCurEndPoint += 1;
+        degreeToCurEndPoint += .5;
         var endingDelta = game.physics.degToPos(degreeToCurEndPoint, this.laserRange);
-        var endingResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
-                                             endingDelta, this.tilesInFOV);
+        var endingResult = game.physics.intersectSegmentIntoBoxes(
+            startingPoint, endingDelta, this.tilesInFOV);
 
         if (endingResult && endingResult.hit) {
             // update end pos with hit pos

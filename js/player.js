@@ -12,7 +12,7 @@ Player.prototype = new Berzerk.Actor();
 Player.prototype.constructor = Player;
 
 Player.prototype.draw = function(game, elapsedTime){
-    if (game.gameState === 'play') {
+    if (game.gameState !== 'attract') {
         Berzerk.Actor.prototype.draw.call(this, game, elapsedTime);
     }
     if (this.bullet) {
@@ -29,7 +29,7 @@ Player.prototype.update = function(game, elapsedTime) {
         game.gameState = 'dead';
     }
 
-    if (game.gameState !== 'play') {
+    if (game.gameState === 'attract') {
         return;
     }
     var dirX = 0;
