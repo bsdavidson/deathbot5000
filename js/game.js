@@ -97,7 +97,6 @@ var Game = Berzerk.Game = function(canvas, canvasBG, fillStyle) {
     this.cols = LEVELS[0].cols;
     this.rows = LEVELS[0].rows;
     this.grid = LEVELS[0].grid;
-
     this.spawnGrid = [];
     this.staticBlocks = [];
     this.fillStyle = fillStyle;
