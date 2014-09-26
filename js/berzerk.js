@@ -41,7 +41,7 @@ window.addEventListener('load', function() {
 
     var canvas = document.querySelector('#berzerk');
     var canvasBG = document.querySelector('#background');
-    var game = window.berzerkGame = new Berzerk.Game(canvas, canvasBG, 'orange');
+    var game = window.berzerkGame = new Berzerk.Game(canvas, canvasBG, 'black');
     game.loadImages();
 
     window.addEventListener('keydown', function(event) {

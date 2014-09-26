@@ -27,6 +27,7 @@ Player.prototype.update = function(game, elapsedTime) {
     if (this.health <= 0) {
         this.active = false;
         game.gameState = 'dead';
+
         if (this.bullet) {
             if (this.bullet.active) {
                 this.bullet = null;
