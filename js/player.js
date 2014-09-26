@@ -27,6 +27,10 @@ Player.prototype.update = function(game, elapsedTime) {
     if (this.health <= 0) {
         this.active = false;
         game.gameState = 'dead';
+         if (this.bullet.active) {
+            this.bullet = null;
+            delete game.actors.playerBullet;
+        }
     }
 
     if (game.gameState === 'attract') {
