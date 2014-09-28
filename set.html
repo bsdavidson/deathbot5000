@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        img {
+            display: none;
+        }
+    </style>
+
+<script>
+	window.addEventListener('load', function() {
+	'use strict';
+
+	// Object Attributes
+	// {id: NUM}
+
+	var a = {foo: 0};
+	var b = {foo: 1};
+	var c = {foo: 2};
+	var d = {};
+
+
+	function Set(options) {
+		this.idAttribute = options.idAttribute;
+		this.items = [];
+		this.itemsById = {};
+	}
+
+	Set.prototype.add = function(object) {
+		var id = object[this.idAttribute];
+		// FIXME: This is not exactly right. Try change "a" above to be: {id: 0}
+		// and see what happens here. Also, try changing the idAttribute to be
+		// "foo" instead of "id" (e.g. a = {foo: 0}) and see what happens.
+		if (id === undefined) {
+			throw new Error('Object Empty! add');
+		}
+		var result = this.contains(object, 'nolog');
+		if (result) {
+			console.log('Return FALSE: already present');
+			return false;
+		}
+		if (!result) {
+			console.log('Return TRUE: adding item');
+			this.itemsById[id] = object;
+			this.items.push(object);  // FIXME: you should be pushing the object, not its id.
+			return true;
+		}
+	};
+
+	Set.prototype.contains = function(object, nolog) {
+		var id = object[this.idAttribute];
+		if (id === undefined) {
+			throw new Error('Object empty!: contains');
+		}
+
+		// FIXME: you can simplify this to:
+		// return Boolean(this.itemsById[id]);
+		if (this.itemsById[id]) {
+			if (!nolog) {
+				console.log('Return TRUE: contains');
+			}
+			return true;
+		} else {
+			if (!nolog) {
+				console.log('Return FALSE: contains');
+			}
+			return false;
+		}
+	};
+
+	Set.prototype.remove = function(object) {
+		var id = object[this.idAttribute];
+		if (id === undefined) {
+			throw new Error('Object empty!: remove');
+		}
+		if (this.itemsById[id]) {
+			console.log('Return TRUE: remove');
+			for (var i = 0, li = this.items.length; i < li; i++) {
+				if (this.items[i] === this.itemsById[id]) {
+					this.items.splice(i, 1);
+				}
+			}
+			delete this.itemsById[id];
+
+			return true;
+		} else {
+			console.log('Return FALSE: remove');
+			return false;
+		}
+	};
+
+	Set.prototype.removeAll = function() {
+		this.items = [];
+		this.itemsById = {};
+	};
+
+	function tests() {
+		function assert(condition) {
+			if (!condition) {
+				throw new Error('Assertion failed');
+			}
+		}
+
+		function assertThrows(callback) {
+			try {
+				callback();
+			} catch (err) {
+				// Expected an error to be thrown, so this is okay.
+				return;
+			}
+			// We got here, so it means an error wasn't thrown like expected.
+			throw new Error('Expected error was not thrown');
+		}
+
+		// Constructs a new set, where idAttribute is a string identifying which
+		// attribute of added objects should be used to track uniqueness.
+		var set = new Set({idAttribute: 'foo'});
+
+		// Add an object to the set. This should not allow an object with the same
+		// idAttribute to be added more than once.
+		assert(set.add(a) === true);  // Returns true, since `a` was added to the set.
+		assert(set.add(a) === false);  // Returns false, since `a` already existed in the set.
+		assert(set.add(b) === false);  // Returns false, since `a` has the same id.
+		assertThrows(function() {
+			set.add(d);  // Should throw an exception, since `d` does not have an id.
+		});
+
+		// Check whether an object exists in the set.
+		assert(set.contains(a) === true);  // Returns true, since `a` has been added in the set.
+		assert(set.contains(b) === true);  // Returns true, since `a` has the same id.
+		assert(set.contains(c) === false);  // Returns false, since `c` hasn't been added to the set.
+		assertThrows(function() {
+			set.contains(d);  // Should throw an exception, since `d` does not have an id.
+		});
+
+		// Should be an array containing all the items currently in the set.
+		// That is, in this case, [a];
+		console.log(set.items);
+		assert(set.items.length === 1);
+		assert(set.items[0] === a);
+
+		// Should be an object containing all the items currently in the set, where
+		// the keys of the object are the item's ids, and the values are the items
+		// themselves. That is, in this case, {"1": a}.
+		console.log(set.itemsById);
+		var keys = Object.keys(set.itemsById);
+		keys.sort();
+		assert(keys.length === 1);
+		assert(keys[0] === '1');
+		assert(set.itemsById['1'] === a);
+
+		// Remove an object from the set.
+		assert(set.remove(a) === true);  // Returns true, since `a` was removed from the set.
+		assert(set.remove(a) === false);  // Returns false, since `a` was already removed from the set.
+		assert(set.remove(c) === false);  // Returns false, since `c` did not exist in the set.
+		assertThrows(function() {
+			set.remove(d);  // Should throw an exception, since `d` does not have an id.
+		});
+
+		console.log(set.items);
+		console.log(set.itemsById);
+		assert(set.items.length === 0);
+		assert(Object.keys(set.itemsById).length === 0);
+
+		// Remove all objects from the set.
+		set.removeAll();
+		assert(set.items.length === 0);
+		assert(Object.keys(set.itemsById).length === 0);
+	}
+
+	tests();
+
+}, false);
+</script>
+</head>
+<body>
+
+<div id="output">
+	Set Test
+</div>
+
+</body>
+
+</html>
