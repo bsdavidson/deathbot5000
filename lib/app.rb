@@ -1,5 +1,12 @@
 require 'sinatra'
 require 'json'
+require 'sequel'
+
+
+DB = Sequel.connect("mysql2://#{ENV['C9_USER']}@#{ENV['IP']}/c9")
+
+
+
 
 $LEADERBOARDS = [
     # {"foo" => 1, "bar" => 2}
@@ -29,6 +36,4 @@ class App < Sinatra::Base
         index_path = File.join(File.dirname(__FILE__), '..','index.htm')
         return File.read(index_path)
     end
-
-
 end
