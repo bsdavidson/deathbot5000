@@ -294,6 +294,7 @@ Game.prototype.initialize = function(elapsedTime) {
     }
 
     this.randomizeSpawns();
+    this.getLeaderboard();
     this.initialized = true;
 };
 
@@ -308,6 +309,7 @@ Game.prototype.draw = function(elapsedTime) {
         this.drawMessage('WASD to Shoot', 180);
         this.drawMessage('Arrow Keys to Move', 220);
         this.drawMessage('Press Space to Begin', 260);
+
     }
     if (this.gameState === 'dead') {
         this.drawMessage('Thou art ' + this.playerDeathMethod);
@@ -382,6 +384,16 @@ Game.prototype.drawScore = function() {
     var width = metrics.width;
     var scoreX = pos - (width / 2);
     this.context.fillText(scoreText, scoreX, 25);
+};
+
+Game.prototype.getLeaderboard = function() {
+    console.log('getting leaderboard');
+
+    $.get('/leaderboards', function (data) {
+        var parsed = JSON.parse(data);
+        console.log(parsed[0].player);
+
+    })
 };
 
 Game.prototype.update = function(elapsedTime) {
