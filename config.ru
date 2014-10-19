@@ -7,7 +7,7 @@
 lib_path = File.dirname(File.absolute_path(__FILE__))
 $LOAD_PATH << lib_path
 
-require 'Sequel'
+require 'sequel'
 unless ENV['RACK_ENV'] == 'test'
     DB = Sequel.connect('mysql2://root@localhost/deathbot')
 end
