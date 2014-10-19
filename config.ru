@@ -4,7 +4,7 @@
 # $prefixed_varibles -- globals
 # @foo -- same as saying this.foo
 
-lib_path = File.join(File.dirname(File.absolute_path(__FILE__)), 'lib')
+lib_path = File.dirname(File.absolute_path(__FILE__))
 $LOAD_PATH << lib_path
 
 require 'Sequel'

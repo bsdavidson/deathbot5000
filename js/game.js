@@ -72,12 +72,13 @@ var CHARACTERS = [
     }
 ];
 
-var Game = Berzerk.Game = function(canvas, canvasBG, fillStyle) {
+var Game = Berzerk.Game = function(canvas, canvasBG, canvasOL, fillStyle) {
     this.mouse = {x: 0, y: 0};
     this.initialized = false;
     this.debugMode = false;
     this.playerDeathMethod = '';
     this.gameState = 'attract'; // attract, play, dead
+    this.prevScore;
     this.score = 0;
     this.round = 2;
     this.numOfMonsters = 0;
@@ -100,14 +101,21 @@ var Game = Berzerk.Game = function(canvas, canvasBG, fillStyle) {
     this.spawnGrid = [];
     this.staticBlocks = [];
     this.fillStyle = fillStyle;
+
     this.canvasBG = canvasBG;
     this.canvasBG.width = window.innerWidth;
     this.canvasBG.height = window.innerHeight;
     this.contextBG = this.canvasBG.getContext('2d');
+
     this.canvas = canvas;
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d');
+
+    this.canvasOL = canvasOL;
+    this.canvasOL.width = window.innerWidth;
+    this.canvasOL.height = window.innerHeight;
+    this.contextOL = this.canvasOL.getContext('2d');
 
     this.messageTime = 10;
 };
@@ -305,7 +313,7 @@ Game.prototype.draw = function(elapsedTime) {
     }, this);
     this.drawScore();
     if (this.gameState === 'attract') {
-        this.drawMessage('Deathbot 5000', 120);
+        this.drawMessage('Deathbot 5000', 120, 35);
         this.drawMessage('WASD to Shoot', 180);
         this.drawMessage('Arrow Keys to Move', 220);
         this.drawMessage('Press Space to Begin', 260);
@@ -364,37 +372,38 @@ Game.prototype.drawLoading = function() {
 };
 
 Game.prototype.drawMessage = function(message, yPos, size) {
-    var pos = this.canvas.width / 2;
+    var pos = this.canvasOL.width / 2;
     yPos = yPos || 200;
-    size = size || 25;
-    this.context.font = size +'px Verdana';
-    var metrics = this.context.measureText(message);
+    size = size || 20;
+    this.contextOL.font = size +'px Verdana';
+    var metrics = this.contextOL.measureText(message);
     var width = metrics.width;
-    var messageX = pos - width / 2;
-    this.context.fillStyle = 'white';
-    this.context.fillText(message, messageX, yPos);
+    var messageX = Math.floor(pos - width / 2);
+    this.contextOL.fillStyle = '#eeee00';
+    this.contextOL.clearRect(messageX, yPos - size, width, size + 5);
+    this.contextOL.fillText(message, messageX, yPos);
 };
 
+
 Game.prototype.drawScore = function() {
-    var pos = this.canvas.width / 2;
-    this.context.font = '25px Verdana';
-    this.context.fillStyle = 'white';
-    var scoreText = 'GAME: ' + this.score;
-    var metrics = this.context.measureText(scoreText);
-    var width = metrics.width;
-    var scoreX = pos - (width / 2);
-    this.context.fillText(scoreText, scoreX, 25);
+    if (this.score !== this.prevScore) {
+        var scoreText = 'GAME: ' + this.score;
+        this.drawMessage(scoreText, 25, 25)
+        this.prevScore = this.score;
+    }
 };
 
 Game.prototype.getLeaderboard = function() {
     console.log('getting leaderboard');
-
-    $.get('/leaderboards', function (data) {
-        var parsed = JSON.parse(data);
-        console.log(parsed[0].player);
+    $.getJSON('/leaderboards', function (data) {
+        //var parsed = JSON.parse(data);
+        console.log(data[0].player);
 
     })
 };
+
+
+
 
 Game.prototype.update = function(elapsedTime) {
     this.iteration++;
