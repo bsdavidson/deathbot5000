@@ -11,7 +11,7 @@ INSERT_SCORE_SQL = 'insert into scores (player, score, created_on) values (:play
 
 
 class App < Sinatra::Base
-    set(:public_dir, File.join(File.dirname(__FILE__), '..'))
+    set(:public_dir, File.dirname(__FILE__))
 
     get '/leaderboards' do
         return DB[SELECT_SCORES_SQL].all.to_json
@@ -31,7 +31,6 @@ class App < Sinatra::Base
     end
 
     get '/' do
-        index_path = File.join(File.dirname(__FILE__), '..','index.html')
-        return File.read(index_path)
+        return File.read('index.html')
     end
 end
