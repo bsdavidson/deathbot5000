@@ -8,9 +8,14 @@ lib_path = File.dirname(File.absolute_path(__FILE__))
 $LOAD_PATH << lib_path
 
 require 'sequel'
-unless ENV['RACK_ENV'] == 'test'
-    DB = Sequel.connect('mysql2://root@localhost/deathbot')
+database_url = case ENV['RACK_ENV']
+when 'production'
+    ENV['CLEARDB_DATABASE_URL'].gsub(/^mysql:/, 'mysql2:')
+when 'development'
+    'mysql2://root@localhost/deathbot'
 end
+
+DB = Sequel.connect(database_url) if database_url
 
 require 'app'
 run App
