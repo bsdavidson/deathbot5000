@@ -29,6 +29,13 @@ Player.prototype.update = function(game, elapsedTime) {
     if (this.health <= 0) {
         this.active = false;
         game.gameState = 'dead';
+        console.log('DEAD!');
+        var lowestScore = SS.currentScores[SS.currentScores.length - 1].score;
+        if (game.score > lowestScore) {
+            var playerName = prompt('Please Enter your Name.');
+            SS.submitScore(playerName, game.score);
+            Berzerk.scores = SS.getScores(8);
+        }
     }
 
     if (game.gameState !== 'play') {

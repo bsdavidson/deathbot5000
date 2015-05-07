@@ -3,6 +3,11 @@
 (function() {
 'use strict';
 
+SS.scoreServer = 'http://simplescore.herokuapp.com';
+SS.gameId = 'DB5K';
+SS.serverId = '320B';
+SS.getScores(8);
+
 var Berzerk = window.Berzerk = {};
 
 Berzerk.DIR_UP = 0;
@@ -83,6 +88,8 @@ window.addEventListener('load', function() {
             game.onResize(event);
         }, 1000);
     };
+
+
 
     var oldFrameTime = (new Date().getTime() / 1000);
     var tick = function() {

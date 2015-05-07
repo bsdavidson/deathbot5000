@@ -108,7 +108,6 @@ var Game = Berzerk.Game = function(canvas, canvasBG, fillStyle) {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d');
-
     this.messageTime = 10;
 };
 
@@ -297,21 +296,38 @@ Game.prototype.initialize = function(elapsedTime) {
     this.initialized = true;
 };
 
+Game.prototype.leaderboard = function() {
+    var yPos = 60;
+    var xPos = 940;
+    if (SS.currentScores){
+        this.drawScores('***** Hi Scores *****', yPos, xPos, 20);
+        yPos += 30;
+        var lb = SS.currentScores;
+        for(var i = 0; i < lb.length; i++) {
+            this.drawScores(lb[i].name + '  ' +  lb[i].score, yPos, xPos, 20);
+            yPos += 30;
+        }
+    }
+};
+
 Game.prototype.draw = function(elapsedTime) {
     this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
     this.eachActor(function(actor) {
         actor.draw(this, elapsedTime);
     }, this);
     this.drawScore();
+
     if (this.gameState === 'attract') {
         this.drawMessage('Deathbot 5000', 120);
         this.drawMessage('WASD to Shoot', 180);
         this.drawMessage('Arrow Keys to Move', 220);
         this.drawMessage('Press Space to Begin', 260);
+        this.leaderboard();
     }
     if (this.gameState === 'dead') {
         this.drawMessage('Thou art ' + this.playerDeathMethod);
         this.drawMessage('Press Space to Start again', 240);
+        this.leaderboard();
     }
 };
 
@@ -373,6 +389,15 @@ Game.prototype.drawMessage = function(message, yPos, size) {
     this.context.fillText(message, messageX, yPos);
 };
 
+Game.prototype.drawScores = function(message, yPos, xPos, size) {
+    var pos = this.canvas.width / 2;
+    yPos = yPos || 200;
+    size = size || 25;
+    this.context.font = size +'px Verdana';
+    this.context.fillStyle = 'white';
+    this.context.fillText(message, xPos, yPos);
+};
+
 Game.prototype.drawScore = function() {
     var pos = this.canvas.width / 2;
     this.context.font = '25px Verdana';
@@ -382,6 +407,7 @@ Game.prototype.drawScore = function() {
     var width = metrics.width;
     var scoreX = pos - (width / 2);
     this.context.fillText(scoreText, scoreX, 25);
+
 };
 
 Game.prototype.update = function(elapsedTime) {
