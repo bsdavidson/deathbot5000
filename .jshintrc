@@ -1,0 +1,19 @@
+{
+  "indent": 2,
+  "maxcomplexity": false,
+  "maxdepth": false,
+  "maxlen": 80,
+  "maxparams": false,
+  "maxstatements": false,
+  "plusplus": false,
+  "node": true,
+  "devel": true,
+  "globals": {
+    "after": false,
+    "afterEach": false,
+    "before": false,
+    "beforeEach": false,
+    "describe": false,
+    "it": false
+  }
+}

@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Thou art dead.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "http-server",
+    "test": "jscs js && jshint js",
+    "watch": "npm start & nodemon -e js -w js -x 'npm test'"
   },
   "repository": {
     "type": "git",
@@ -16,8 +18,9 @@
   },
   "homepage": "https://github.com/bsdavidson/deathbot5000",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "http-server": "^0.9.0",
+    "jscs": "^2.11.0",
+    "jshint": "^2.9.1",
+    "nodemon": "^1.9.1"
   }
 }

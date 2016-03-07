@@ -1,0 +1,9 @@
+{
+  "disallowEmptyBlocks": true,
+  "disallowMultipleVarDecl": false,
+  "disallowPaddingNewlinesInBlocks": true,
+  "excludeFiles": [
+    "node_modules/**"
+  ],
+  "preset": "google"
+}

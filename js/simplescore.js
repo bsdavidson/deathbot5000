@@ -30,7 +30,7 @@
           SS.currentScores = SS._returnTable();
           // TODO: Figure out wtf
           SS.currentScores.sort(function(a, b) {
-           return a.score - b.score;
+            return a.score - b.score;
           });
           if (SS.currentScores.length > maxScores) {
             var del = SS.currentScores.length - maxScores;
