@@ -3,13 +3,23 @@
 
 <head>
     <meta charset="UTF-8"/>
-    <title>Berzerk</title>
-    <link rel="stylesheet" href="css/berzerk.css"/>
+    <title>Deathbot</title>
+    <link rel="stylesheet" href="css/deathbot.css"/>
     <script src="js/simplescore.js"></script>
-    <script src="js/berzerk.js"></script>
+    <script>
+    SS.scoreServer = 'http://simplescore.herokuapp.com';
+    SS.gameId = 'DB5K';
+    SS.serverId = '320B';
+    SS.getScores(8);
+    </script>
+    <script src="js/berzerk/index.js"></script>
+    <script src="js/berzerk/keys.js"></script>
+    <script src="js/berzerk/physics.js"></script>
+    <script src="js/berzerk/actor.js"></script>
+    <script src="js/berzerk/game.js"></script>
+
+    <script src="js/deathbot.js"></script>
     <script src="js/game.js"></script>
-    <script src="js/physics.js"></script>
-    <script src="js/actor.js"></script>
     <script src="js/player.js"></script>
     <script src="js/monster.js"></script>
     <script src="js/bullet.js"></script>
@@ -17,7 +27,7 @@
 
 <body>
     <canvas id="background"></canvas>
-    <canvas id="berzerk"></canvas>
+    <canvas id="deathbot"></canvas>
 </body>
 
 </html>

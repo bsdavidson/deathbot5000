@@ -1,22 +1,22 @@
 /*jshint browser:true */
 
-(function(Berzerk) {
+(function(Deathbot, Actor, Physics) {
 'use strict';
 
-var Player = Berzerk.Player = function Player(
+var Player = Deathbot.Player = function Player(
     image, startX, startY, scale, speedX, speedY, dirX, dirY) {
-  Berzerk.Actor.apply(this, arguments);
+  Actor.apply(this, arguments);
   this.health = 100;
   this.recoveryTimer = 2;
   this.eyeOffset = {x: 0, y: 10};
 };
 
-Player.prototype = new Berzerk.Actor();
+Player.prototype = new Actor();
 Player.prototype.constructor = Player;
 
 Player.prototype.draw = function(game, elapsedTime) {
   if (game.gameState === 'play') {
-    Berzerk.Actor.prototype.draw.call(this, game, elapsedTime);
+    Actor.prototype.draw.call(this, game, elapsedTime);
   }
   if (this.bullet) {
     this.bullet.draw(game, elapsedTime);
@@ -31,11 +31,12 @@ Player.prototype.update = function(game, elapsedTime) {
     this.active = false;
     game.gameState = 'dead';
     console.log('DEAD!');
-    var lowestScore = SS.currentScores[SS.currentScores.length - 1].score;
+    var lowestScore = SS.currentScores && SS.currentScores.length ?
+      SS.currentScores[SS.currentScores.length - 1].score : 0;
     if (game.score > lowestScore) {
       var playerName = prompt('Please Enter your Name.');
       SS.submitScore(playerName, game.score);
-      Berzerk.scores = SS.getScores(8);
+      Deathbot.scores = SS.getScores(8);
     }
   }
 
@@ -105,7 +106,7 @@ Player.prototype.update = function(game, elapsedTime) {
     this.facing = 'right';
   }
 
-  var movingBox = new Berzerk.Physics.Box(this.curX, this.curY, this.width,
+  var movingBox = new Physics.Box(this.curX, this.curY, this.width,
     this.height);
   var segmentDelta = {
     x: (this.speedX * elapsedTime) * dirX,
@@ -144,7 +145,7 @@ Player.prototype.update = function(game, elapsedTime) {
     }
   }
 
-  this.eachOverlappingActor(game, Berzerk.Monster, function(actor) {
+  this.eachOverlappingActor(game, Deathbot.Monster, function(actor) {
     this.debugColor = 'white';
     this.health -= 20;
     if (this.health <= 0) {
@@ -155,7 +156,7 @@ Player.prototype.update = function(game, elapsedTime) {
 
 // startX, startY, speed, dirX, dirY
 Player.prototype.fireBullet = function(game, dirX, dirY) {
-  this.bullet = new Berzerk.Bullet(this.curX, this.curY + 20, 600, dirX, dirY);
+  this.bullet = new Deathbot.Bullet(this.curX, this.curY + 20, 600, dirX, dirY);
   game.actors.playerBullet = this.bullet;
 };
-}(window.Berzerk));
+}(window.Deathbot, window.Berzerk.Actor, window.Berzerk.Physics));

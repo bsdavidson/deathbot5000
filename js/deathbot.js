@@ -3,50 +3,17 @@
 (function() {
 'use strict';
 
-SS.scoreServer = 'http://simplescore.herokuapp.com';
-SS.gameId = 'DB5K';
-SS.serverId = '320B';
-SS.getScores(8);
-
-var Berzerk = window.Berzerk = {};
-
-Berzerk.DIR_UP = 0;
-Berzerk.DIR_DOWN = 1;
-Berzerk.DIR_LEFT = 2;
-Berzerk.DIR_RIGHT = 3;
-Berzerk.EPSILON = 1 / 32;
-
-Berzerk.directions = [
-  {x: 0, y: -1},
-  {x: 0, y: 1},
-  {x: -1, y: 0},
-  {x: 1, y: 0}
-];
-
-Berzerk.directionNames = ['up', 'down', 'left', 'right'];
-
-Berzerk.getDirectionIndex = function(dirX, dirY) {
-  if (dirX > 0) {
-    return Berzerk.DIR_RIGHT;
-  } else if (dirX < 0) {
-    return Berzerk.DIR_LEFT;
-  } else if (dirY > 0) {
-    return Berzerk.DIR_DOWN;
-  } else if (dirY < 0) {
-    return Berzerk.DIR_UP;
-  } else {
-    return Berzerk.DIR_RIGHT;
-  }
-};
+var Deathbot = window.Deathbot = {};
 
 window.addEventListener('load', function() {
-  // The Berzerk properties will be filled in by the other scripts. Even
+  // The Deathbot properties will be filled in by the other scripts. Even
   // though they don't look like they exist at this point, they will by the
   // time the window load event has fired.
 
-  var canvas = document.querySelector('#berzerk');
+  var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
-  var game = window.berzerkGame = new Berzerk.Game(canvas, canvasBG, 'orange');
+  var game = window.deathbotGame = new Deathbot.Game(
+    canvas, canvasBG, 'orange');
   game.loadImages();
 
   window.addEventListener('keydown', function(event) {

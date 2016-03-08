@@ -1,11 +1,11 @@
 /*jshint browser:true */
 
-(function(Berzerk) {
+(function(Deathbot, Actor, Physics) {
 'use strict';
 
-var Monster = Berzerk.Monster = function Monster(
+var Monster = Deathbot.Monster = function Monster(
     image, startX, startY, scale, speedX, speedY, dirX) {
-  Berzerk.Actor.apply(this, arguments);
+  Actor.apply(this, arguments);
   this.dirTimer = 0;
   this.isFiring = false;
   this.laserDelta = {};
@@ -14,12 +14,12 @@ var Monster = Berzerk.Monster = function Monster(
   this.eyeOffset = {x: 0, y: 14};
 };
 
-Monster.prototype = new Berzerk.Actor();
+Monster.prototype = new Actor();
 Monster.prototype.constructor = Monster;
 
 Monster.prototype.draw = function(game, elapsedTime) {
   if (this.active) {
-    Berzerk.Actor.prototype.draw.call(this, game, elapsedTime);
+    Actor.prototype.draw.call(this, game, elapsedTime);
     if (game.debugMode) {
       game.context.font = '16px Verdana';
       game.context.fillStyle = 'red';
@@ -30,7 +30,7 @@ Monster.prototype.draw = function(game, elapsedTime) {
   } else if (this.alpha >= 0.1) {
     this.alpha -= 0.1;
     game.context.globalAlpha = this.alpha;
-    Berzerk.Actor.prototype.draw.call(this, game, elapsedTime);
+    Actor.prototype.draw.call(this, game, elapsedTime);
     game.context.globalAlpha = 1;
   }
 };
@@ -65,15 +65,15 @@ Monster.prototype.fireLaser = function(game, player) {
   } else {
     if (blockResult && blockResult.hit) {
       // update end pos with hit pos
-      endPos = new Berzerk.Physics.Point(blockResult.hitPos.x,
+      endPos = new Physics.Point(blockResult.hitPos.x,
         blockResult.hitPos.y);
       game.context.strokeStyle = 'red';
     } else if (targetResult && targetResult.hit) {
-      endPos = new Berzerk.Physics.Point(targetResult.hitPos.x,
+      endPos = new Physics.Point(targetResult.hitPos.x,
         targetResult.hitPos.y);
       targetHit = true;
     } else {
-      endPos = new Berzerk.Physics.Point(laserEndpoint.x, laserEndpoint.y);
+      endPos = new Physics.Point(laserEndpoint.x, laserEndpoint.y);
     }
   }
 
@@ -120,7 +120,7 @@ Monster.prototype.fireLaser = function(game, player) {
 };
 
 Monster.prototype.update = function(game, elapsedTime) {
-  Berzerk.Actor.prototype.update.call(this, game, elapsedTime);
+  Actor.prototype.update.call(this, game, elapsedTime);
   this.laserStart = {
     x: this.curX + (this.width / 2),
     y: this.curY + 14
@@ -131,11 +131,11 @@ Monster.prototype.update = function(game, elapsedTime) {
     this.moving = Boolean(game.getRandom(0, 1));
     this.dirTimer = game.getRandom(2, 4);
     var nextDirection = game.getRandom(0, 3);
-    this.dirX = Berzerk.directions[nextDirection].x;
-    this.dirY = Berzerk.directions[nextDirection].y;
+    this.dirX = Actor.directions[nextDirection].x;
+    this.dirY = Actor.directions[nextDirection].y;
   }
   this.visibleActors = 0;
-  this.eachVisibleActor(game, Berzerk.Player, function(player) {
+  this.eachVisibleActor(game, Deathbot.Player, function(player) {
     this.visibleActors += 1;
     this.debugColor = 'white';
 
@@ -164,7 +164,7 @@ Monster.prototype.update = function(game, elapsedTime) {
     this.firing = false;
   }
 
-  this.eachOverlappingActor(game, Berzerk.Bullet, function(bullet) {
+  this.eachOverlappingActor(game, Deathbot.Bullet, function(bullet) {
     bullet.active = false;
     this.debugColor = 'green';
     this.active = false;
@@ -172,4 +172,4 @@ Monster.prototype.update = function(game, elapsedTime) {
     game.score++;
   });
 };
-}(window.Berzerk));
+}(window.Deathbot, window.Berzerk.Actor, window.Berzerk.Physics));

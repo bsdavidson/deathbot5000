@@ -1,6 +1,6 @@
 /*jshint browser:true */
 
-(function(Berzerk) {
+(function(Berzerk, Physics) {
 'use strict';
 
 var Actor = Berzerk.Actor = function Actor(
@@ -51,26 +51,54 @@ var Actor = Berzerk.Actor = function Actor(
   this.eyeOffset = {x: 0, y: 0};
 };
 
+Actor.DIR_UP = 0;
+Actor.DIR_DOWN = 1;
+Actor.DIR_LEFT = 2;
+Actor.DIR_RIGHT = 3;
+
+Actor.directions = [
+  {x: 0, y: -1},
+  {x: 0, y: 1},
+  {x: -1, y: 0},
+  {x: 1, y: 0}
+];
+
+Actor.directionNames = ['up', 'down', 'left', 'right'];
+
+Actor.getDirectionIndex = function(dirX, dirY) {
+  if (dirX > 0) {
+    return Actor.DIR_RIGHT;
+  } else if (dirX < 0) {
+    return Actor.DIR_LEFT;
+  } else if (dirY > 0) {
+    return Actor.DIR_DOWN;
+  } else if (dirY < 0) {
+    return Actor.DIR_UP;
+  } else {
+    return Actor.DIR_RIGHT;
+  }
+};
+
 Actor.prototype.collidesWithWalls = function(game) {
   var result = {hit: false, dirX: 0, dirY: 0};
   // Hit the Left Wall
   if (this.curX < 0) {
-    this.curX = Berzerk.EPSILON;
+    this.curX = Physics.EPSILON;
     result = {hit: true, dirX: 1};
   }
   // Hit right wall
   if (this.curX > (game.canvas.width - this.width)) {
-    this.curX = (game.canvas.width - this.width) - Berzerk.EPSILON;
+    this.curX = (game.canvas.width - this.width) - Physics.EPSILON;
     result = {hit: true, dirX: -1};
   }
   // Hit the Ceiling
   if (this.curY < 0) {
-    this.curY = Berzerk.EPSILON;
+    this.curY = Physics.EPSILON;
     result = {hit: true, dirY: 1};
   }
   // Hit the Floor
   if (this.curY > game.canvas.height - this.height) {
-    this.curY = (game.canvas.height - this.height) - Berzerk.EPSILON;
+    this.curY = (game.canvas.height - this.height) - Physics.EPSILON;
     result = {hit: true, dirY: -1};
   }
   return result;
@@ -134,7 +162,7 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
         visionDelta, actorArr);
 
       if (game.debugMode) {
-        var endPos = new Berzerk.Physics.Point(
+        var endPos = new Physics.Point(
           actor.curX + (actor.width / 2) + actor.eyeOffset.x,
           actor.curY + actor.eyeOffset.y);
         game.context.beginPath();
@@ -161,7 +189,7 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
   }, this);
 };
 
-Actor.prototype.update = function Actor(game, elapsedTime) {
+Actor.prototype.update = function(game, elapsedTime) {
   var hitWall = this.collidesWithWalls(game);
   if (hitWall.dirX) {
     this.dirX = hitWall.dirX;
@@ -171,7 +199,7 @@ Actor.prototype.update = function Actor(game, elapsedTime) {
   }
 
   if (this.moving) {
-    var movingBox = new Berzerk.Physics.Box(this.curX, this.curY, this.width,
+    var movingBox = new Physics.Box(this.curX, this.curY, this.width,
       this.height);
     var segmentDelta = {
       x: (this.speedX * elapsedTime) * this.dirX,
@@ -195,8 +223,8 @@ Actor.prototype.update = function Actor(game, elapsedTime) {
   }
 
   // Image Switcher
-  this.facing = Berzerk.directionNames[
-    Berzerk.getDirectionIndex(this.dirX, this.dirY)];
+  this.facing = Actor.directionNames[
+    Actor.getDirectionIndex(this.dirX, this.dirY)];
   this.curImage = this.dirImages[this.facing];
 };
 
@@ -261,4 +289,4 @@ Actor.prototype.draw = function(game, elapsedTime) {
       this.curY + (this.height + 30));
   }
 };
-}(window.Berzerk));
+}(window.Berzerk, window.Berzerk.Physics));

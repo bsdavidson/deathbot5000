@@ -1,30 +1,9 @@
 /*jshint browser:true */
 
-(function(Berzerk) {
+(function(Deathbot, BerzerkGame, Keys, Physics) {
 'use strict';
 
 var DEBUG_TILE = 9;
-
-var KEY_UP = 38;
-var KEY_DOWN = 40;
-var KEY_LEFT = 37;
-var KEY_RIGHT = 39;
-var KEY_W = 87;
-var KEY_A = 65;
-var KEY_S = 83;
-var KEY_D = 68;
-var KEY_SPACE = 32;
-
-var KEY_NAMES = {};
-KEY_NAMES[KEY_SPACE] = 'start';
-KEY_NAMES[KEY_UP] = 'up';
-KEY_NAMES[KEY_DOWN] = 'down';
-KEY_NAMES[KEY_LEFT] = 'left';
-KEY_NAMES[KEY_RIGHT] = 'right';
-KEY_NAMES[KEY_W] = 'shootUp';
-KEY_NAMES[KEY_A] = 'shootLeft';
-KEY_NAMES[KEY_S] = 'shootDown';
-KEY_NAMES[KEY_D] = 'shootRight';
 
 var LEVELS = [
   {
@@ -72,25 +51,14 @@ var CHARACTERS = [
   }
 ];
 
-var Game = Berzerk.Game = function(canvas, canvasBG, fillStyle) {
-  this.mouse = {x: 0, y: 0};
-  this.initialized = false;
-  this.debugMode = false;
+var Game = Deathbot.Game = function Game(canvas, canvasBG, fillStyle) {
+  BerzerkGame.call(this, canvas);
+
   this.playerDeathMethod = '';
   this.gameState = 'attract'; // attract, play, dead
   this.score = 0;
   this.round = 2;
   this.numOfMonsters = 0;
-  this.images = {};
-  this.imagesLoaded = false;
-  this.actors = {};
-  this.keyDown = {};
-  for (var key in KEY_NAMES) {
-    if (KEY_NAMES.hasOwnProperty(key)) {
-      var name = KEY_NAMES[key];
-      this.keyDown[name] = false;
-    }
-  }
   this.cellWidth = 32;
   this.cellHeight = 32;
   this.tiles = null;
@@ -104,12 +72,21 @@ var Game = Berzerk.Game = function(canvas, canvasBG, fillStyle) {
   this.canvasBG.width = window.innerWidth;
   this.canvasBG.height = window.innerHeight;
   this.contextBG = this.canvasBG.getContext('2d');
-  this.canvas = canvas;
-  this.canvas.width = window.innerWidth;
-  this.canvas.height = window.innerHeight;
-  this.context = this.canvas.getContext('2d');
   this.messageTime = 10;
+
+  this.defineKey('start', Keys.SPACE);
+  this.defineKey('up', Keys.UP);
+  this.defineKey('down', Keys.DOWN);
+  this.defineKey('left', Keys.LEFT);
+  this.defineKey('right', Keys.RIGHT);
+  this.defineKey('shootUp', Keys.W);
+  this.defineKey('shootLeft', Keys.A);
+  this.defineKey('shootDown', Keys.S);
+  this.defineKey('shootRight', Keys.D);
 };
+
+Game.prototype = new BerzerkGame();
+Game.prototype.constructor = Game;
 
 Game.prototype.createSpawnPoints = function(actorWidth, actorHeight) {
   var spawnLocations = [];
@@ -145,20 +122,16 @@ Game.prototype.createSpawnPoints = function(actorWidth, actorHeight) {
 
 Game.prototype.randomizeSpawns = function() {
   this.eachActor(function(actor) {
-    if (!(actor instanceof Berzerk.Monster)) {
+    if (!(actor instanceof Deathbot.Monster)) {
       return;
     }
     actor.spawnPoints = this.createSpawnPoints(actor.width, actor.height);
     var spawnIndex = actor.spawnPoints[
     Math.floor(Math.random() * actor.spawnPoints.length)];
     var spawnXY = this.calcGridXY(spawnIndex);
-    actor.curX = spawnXY.x1 + Berzerk.EPSILON;
-    actor.curY = spawnXY.y1 + Berzerk.EPSILON;
+    actor.curX = spawnXY.x1 + Physics.EPSILON;
+    actor.curY = spawnXY.y1 + Physics.EPSILON;
   },this);
-};
-
-Game.prototype.getRandom = function(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 Game.prototype.calcGridXY = function(gridIndex) {
@@ -176,78 +149,8 @@ Game.prototype.calcGridXY = function(gridIndex) {
 
 // Loops through Actor array and creates callable images.
 Game.prototype.loadImages = function() {
-  var imagesToLoad = [];
-  var self = this;
-  var loadedImages = 0;
-  var numImages = 0;
-
-  var getReverseImage = function(src, w, h) {
-    numImages++;
-    var tempImage = new Image();
-    var tempCanvas = document.createElement('canvas');
-    var tempContext = tempCanvas.getContext('2d');
-    tempCanvas.width = w;
-    tempCanvas.height = h;
-    tempContext.translate(w, 0);
-    tempContext.scale(-1, 1);
-    tempContext.drawImage(src, 0, 0);
-    var encodedImage = tempCanvas.toDataURL();
-    tempImage.onload = onImageLoaded;
-    tempImage.src = encodedImage;
-    return tempImage;
-  };
-
-  var onImageLoaded = function() {
-    loadedImages++;
-    console.log('loaded image', loadedImages, 'of', numImages);
-    if (loadedImages === numImages) {
-      self.imagesLoaded = true;
-    }
-  };
-
-  var loadImage = function(src, callback) {
-    var image = new Image();
-    image.onload = function() {
-      if (callback) {
-        callback.call(image);
-      }
-      onImageLoaded();
-    };
-    imagesToLoad.push({image: image, src: src});
-    return image;
-  };
-
-  var onMainImageLoaded = function() {
-    this.rev = getReverseImage(this, this.width, this.height);
-  };
-
-  for (var i = 0, il = CHARACTERS.length; i < il; i++) {
-    // get our main image
-    var character = CHARACTERS[i];
-    var image = this.images[character.name] = loadImage(
-      character.image,
-      onMainImageLoaded);
-
-    if (character.imageUp) {
-      image.up = loadImage(character.imageUp);
-    } else {
-      image.up = image;
-    }
-
-    if (character.imageDown) {
-      image.down = loadImage(character.imageDown);
-    } else {
-      image.down = image;
-    }
-
-    image.w = character.w;
-    image.h = character.h;
-  }
-  this.tiles = loadImage('img/tiles.png');
-  numImages = imagesToLoad.length;
-  for (i = 0, il = imagesToLoad.length; i < il; i++) {
-    imagesToLoad[i].image.src = imagesToLoad[i].src;
-  }
+  BerzerkGame.prototype.loadImages.call(this, CHARACTERS,
+    {tiles: 'img/tiles.png'});
 };
 
 Game.prototype.eachActor = function(callback, context) {
@@ -259,19 +162,22 @@ Game.prototype.eachActor = function(callback, context) {
 };
 
 Game.prototype.initialize = function(elapsedTime) {
+  BerzerkGame.prototype.initialize.call(this, elapsedTime);
+
+  this.drawBackground(elapsedTime);
   this.staticBlocks = [];
-  this.physics = new Berzerk.Physics(this);
+  this.physics = new Physics(this);
   this.actors = {
     //image, startX, startY, scale, speedX, speedY, dirX, dirY
-    player: new Berzerk.Player(
+    player: new Deathbot.Player(
       this.images.player, 85, 454, 100, 150, 150, 1, 1),
-    deathbot1: new Berzerk.Monster(
+    deathbot1: new Deathbot.Monster(
       this.images.deathbot, 250, 500, 100, 100, 100, -1, 1),
-    deathbot3: new Berzerk.Monster(
+    deathbot3: new Deathbot.Monster(
       this.images.deathbot, 120, 110, 300, 110, 115, 1, 1),
-    deathbot4: new Berzerk.Monster(
+    deathbot4: new Deathbot.Monster(
       this.images.deathbot, 300, 200, 100, 200, 200, -1, -1),
-    deathbot5: new Berzerk.Monster(
+    deathbot5: new Deathbot.Monster(
       this.images.deathbot, 500, 400, 100, 200, 200, 1, 1)
   };
 
@@ -281,7 +187,7 @@ Game.prototype.initialize = function(elapsedTime) {
   this.score = 0;
 
   this.eachActor(function(actor) {
-    if (actor instanceof Berzerk.Monster) {
+    if (actor instanceof Deathbot.Monster) {
       this.numOfMonsters++;
     }
     actor.active = true;
@@ -291,14 +197,13 @@ Game.prototype.initialize = function(elapsedTime) {
   for (var i = 0, li = this.grid.length; li > i; i++) {
     if (this.grid[i]) {
       var blockXY = this.calcGridXY(i);
-      var block = new Berzerk.Physics.Box(
+      var block = new Physics.Box(
         blockXY.x1, blockXY.y1, this.cellWidth, this.cellHeight);
       this.staticBlocks.push(block);
     }
   }
 
   this.randomizeSpawns();
-  this.initialized = true;
 };
 
 Game.prototype.leaderboard = function() {
@@ -316,10 +221,8 @@ Game.prototype.leaderboard = function() {
 };
 
 Game.prototype.draw = function(elapsedTime) {
-  this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
-  this.eachActor(function(actor) {
-    actor.draw(this, elapsedTime);
-  }, this);
+  BerzerkGame.prototype.draw.call(this, elapsedTime);
+
   this.drawScore();
 
   if (this.gameState === 'attract') {
@@ -365,9 +268,6 @@ Game.prototype.drawGrid = function(grid) {
         this.contextBG.drawImage(this.tiles, grid[index] *
         this.cellWidth, 0, this.cellWidth, this.cellHeight,
         gridPosX, gridPosY, this.cellWidth, this.cellHeight);
-        // this.context.font = '10px Arial';
-        // this.context.fillStyle = 'red';
-        // this.context.fillText(index, gridPosX, gridPosY + 8);
       }
       if (grid[index] === DEBUG_TILE) {
         this.contextBG.strokeStyle = 'red';
@@ -416,7 +316,8 @@ Game.prototype.drawScore = function() {
 };
 
 Game.prototype.update = function(elapsedTime) {
-  this.iteration++;
+  BerzerkGame.prototype.update.call(this, elapsedTime);
+
   if (this.keyDown.start && this.gameState !== 'play') {
     this.gameState = 'play';
     console.log('Game Start');
@@ -424,80 +325,26 @@ Game.prototype.update = function(elapsedTime) {
     this.initialized = false;
   }
 
-  this.eachActor(function(actor) {
-    if (actor.active) {
-      actor.update(this, elapsedTime);
+  if (this.numOfMonsters === 0 && this.initialized) { // You beat all monsters
+    this.randomizeSpawns();
+    if (this.messageTime > 0) { // show next round message
+      this.drawMessage('Round ' + this.round);
+      this.messageTime -= elapsedTime;
+    } else {
+      this.messageTime = 10;
+      this.round++;
+      // Reviving monsters, this will be refactored later to randomize
+      // positions rather than just reactivating the dead ones where they
+      // fell.
+      this.eachActor(function(actor) {
+        if (actor instanceof Deathbot.Monster) {
+          this.numOfMonsters++;
+          actor.active = true;
+          actor.alpha = 1;
+        }
+      }, this);
     }
-    if (this.numOfMonsters === 0 && this.initialized) { // You beat all monsters
-      this.randomizeSpawns();
-      if (this.messageTime > 0) { // show next round message
-        this.drawMessage('Round ' + this.round);
-        this.messageTime -= elapsedTime;
-      } else {
-        this.messageTime = 10;
-        this.round++;
-        // Reviving monsters, this will be refactored later to randomize
-        // positions rather than just reactivating the dead ones where they
-        // fell.
-        this.eachActor(function(actor) {
-          if (actor instanceof Berzerk.Monster) {
-            this.numOfMonsters++;
-            actor.active = true;
-            actor.alpha = 1;
-          }
-        }, this);
-      }
-    }
-  }, this);
-};
-
-Game.prototype.tick = function(elapsedTime) {
-  if (this.imagesLoaded) {
-    if (!this.initialized) {
-      this.drawBackground(elapsedTime);
-      this.initialize(elapsedTime);
-    }
-    this.draw(elapsedTime);
-    this.update(elapsedTime);
-  } else {
-    this.drawLoading();
   }
 };
-
-Game.prototype.onKeyDown = function(event) {
-  event.preventDefault();
-  var key = event.keyCode;
-  if (KEY_NAMES.hasOwnProperty(key)) {
-    var name = KEY_NAMES[key];
-    this.keyDown[name] = true;
-  }
-};
-
-Game.prototype.onKeyUp = function(event) {
-  event.preventDefault();
-  var key = event.keyCode;
-  if (KEY_NAMES.hasOwnProperty(key)) {
-    var name = KEY_NAMES[key];
-    this.keyDown[name] = false;
-  }
-};
-
-Game.prototype.onMouseMove = function(event) {
-  this.mouse.x = event.pageX - this.canvas.offsetLeft;
-  this.mouse.y = event.pageY - this.canvas.offsetTop;
-};
-
-Game.prototype.onResize = function(event) {
-  this.context = this.canvas.getContext('2d');
-  this.canvas.width = window.innerWidth;
-  this.canvas.height = window.innerHeight;
-};
-
-Game.prototype.setFocus = function(event, isBlurred) {
-  if (this.debugMode && isBlurred) {
-    this.framesPerSecond = 1;
-  } else {
-    this.framesPerSecond = 30;
-  }
-};
-}(window.Berzerk));
+}(window.Deathbot, window.Berzerk.Game, window.Berzerk.Keys,
+  window.Berzerk.Physics));

@@ -7,6 +7,8 @@ var Physics = Berzerk.Physics = function Physics(game) {
   this.game = game;
 };
 
+Physics.EPSILON = 1 / 32;
+
 var Box = Physics.Box = function Box(x, y, w, h) {
   this.x = x;
   this.y = y;
@@ -151,8 +153,8 @@ Physics.prototype.intersectSegmentIntoBox = function(
     y: segmentPos.y + (segmentDelta.y * hitPercent)
   };
 
-  hitPos.x += hitNormal.x * Berzerk.EPSILON;
-  hitPos.y += hitNormal.y * Berzerk.EPSILON;
+  hitPos.x += hitNormal.x * Physics.EPSILON;
+  hitPos.y += hitNormal.y * Physics.EPSILON;
 
   return {
     hit: hit,
@@ -233,20 +235,20 @@ Physics.prototype.checkNearestHit = function(
   if (sourceActor.dirX === -1 || sourceActor.dirX === 1) {
     if (Math.abs(sourceX - staticX) < Math.abs(sourceX - targetX)) {
       result.targetHit = false;
-      result.endPos = new Berzerk.Physics.Point(
+      result.endPos = new Physics.Point(
         staticResult.hitPos.x, staticResult.hitPos.y);
     } else {
-      result.endPos = new Berzerk.Physics.Point(
+      result.endPos = new Physics.Point(
         targetResult.hitPos.x, targetResult.hitPos.y);
       result.targetHit = true;
     }
   } else if (sourceActor.dirY === -1 || sourceActor.dirY === 1) {
     if (Math.abs(sourceY - staticY) < Math.abs(sourceY - targetY)) {
       result.targetHit = false;
-      result.endPos = new Berzerk.Physics.Point(
+      result.endPos = new Physics.Point(
         staticResult.hitPos.x, staticResult.hitPos.y);
     } else {
-      result.endPos = new Berzerk.Physics.Point(
+      result.endPos = new Physics.Point(
         targetResult.hitPos.x, targetResult.hitPos.y);
       result.targetHit = true;
     }
