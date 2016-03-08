@@ -15,7 +15,7 @@ Player.prototype = new Actor();
 Player.prototype.constructor = Player;
 
 Player.prototype.draw = function(game, elapsedTime) {
-  if (game.gameState === 'play') {
+  if (game.gameState !== 'attract') {
     Actor.prototype.draw.call(this, game, elapsedTime);
   }
   if (this.bullet) {
@@ -31,6 +31,10 @@ Player.prototype.update = function(game, elapsedTime) {
     this.active = false;
     game.gameState = 'dead';
     console.log('DEAD!');
+    if (this.bullet && this.bullet.active) {
+      this.bullet = null;
+      delete game.actors.playerBullet;
+    }
     var lowestScore = SS.currentScores && SS.currentScores.length ?
       SS.currentScores[SS.currentScores.length - 1].score : 0;
     if (game.score > lowestScore) {
@@ -40,7 +44,7 @@ Player.prototype.update = function(game, elapsedTime) {
     }
   }
 
-  if (game.gameState !== 'play') {
+  if (game.gameState === 'attract') {
     return;
   }
   var dirX = 0;

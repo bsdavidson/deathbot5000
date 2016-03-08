@@ -34,6 +34,10 @@ var Actor = Berzerk.Actor = function Actor(
     unscaledHeight = 1;
   }
 
+  this.previousDir = {x: this.dirX, y: this.dirY};
+  this.startX = startX;
+  this.startY = startY;
+
   this.facing = 'right';
   this.dirX = dirX;
   this.dirY = dirY;
@@ -42,6 +46,7 @@ var Actor = Berzerk.Actor = function Actor(
   this.curX = startX;
   this.curY = startY;
   this.previousPos = {x: this.curX, y: this.curY};
+  this.tilesInFOV = [];
   this.speedX = speedX;
   this.speedY = speedY;
   this.moving = true;
@@ -122,6 +127,26 @@ Actor.prototype.eachOverlappingActor = function(
   }, this);
 };
 
+Actor.prototype.getTilesInFOV = function(game) {
+  this.tilesInFOV = [];
+  var blocks = game.staticBlocks;
+  for (var i = 0, li = blocks.length; i < li; i++) {
+    var visionDelta = {
+      x: (blocks[i].x) - this.curX,
+      y: (blocks[i].y) - this.curY
+    };
+    var blockDirLength = Math.sqrt(visionDelta.x * visionDelta.x +
+      visionDelta.y * visionDelta.y);
+    var blockDir = {};
+    blockDir.x = visionDelta.x / blockDirLength;
+    blockDir.y = visionDelta.y / blockDirLength;
+    var dotProduct = (this.dirX * blockDir.x) + (this.dirY * blockDir.y);
+    if (dotProduct > 0.70) {
+      this.tilesInFOV.push(game.staticBlocks[i]);
+    }
+  }
+};
+
 Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
   game.eachActor(function(actor) {
     if (!(actor instanceof actorConstructor)) {
@@ -130,24 +155,32 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
     if (game.gameState !== 'play') {
       return;
     }
+    var visionStart = {
+      x: this.curX + (this.width / 2) + this.eyeOffset.x,
+      y: this.curY + this.eyeOffset.y
+    };
+    var visionDelta = {
+      x: (actor.curX + (actor.width / 2) + actor.eyeOffset.x) - visionStart.x,
+      y: (actor.curY + actor.eyeOffset.y) - visionStart.y
+    };
+    var actorDirLength = Math.sqrt(
+      visionDelta.x * visionDelta.x + visionDelta.y * visionDelta.y);
+    var actorDir = {
+      x: visionDelta.x / actorDirLength,
+      y: visionDelta.y / actorDirLength
+    };
+    var dotProduct = (this.dirX * actorDir.x) + (this.dirY * actorDir.y);
 
     var visible = false;
-    var inFOV = (
-      (this.dirX === 1 && (this.curX + this.width) < actor.curX) ||
-      (this.dirX === -1 && this.curX > (actor.curX + actor.width)) ||
-      (this.dirY === -1 && this.curY > (actor.curY + actor.height)) ||
-      (this.dirY === 1 && this.curY + this.height < actor.curY)
-      );
+
+    var inFOV;
+    if (dotProduct > 0.70) {
+      inFOV = true;
+    } else {
+      inFOV = false;
+    }
 
     if (inFOV) {
-      var visionStart = {
-        x: this.curX + (this.width / 2) + this.eyeOffset.x,
-        y: this.curY + this.eyeOffset.y
-      };
-      var visionDelta = {
-        x: (actor.curX + (actor.width / 2) + actor.eyeOffset.x) - visionStart.x,
-        y: (actor.curY + actor.eyeOffset.y) - visionStart.y
-      };
       var actorArr = [];
       var actorObj = {
         x: actor.curX,
@@ -156,13 +189,13 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
         h: actor.height
       };
       actorArr.push(actorObj);
-      var blockResult = game.physics.intersectSegmentIntoBoxes(visionStart,
-        visionDelta, game.staticBlocks);
-      var actorResult = game.physics.intersectSegmentIntoBoxes(visionStart,
-        visionDelta, actorArr);
+      var blockResult = game.physics.intersectSegmentIntoBoxes(
+        visionStart, visionDelta, game.staticBlocks);
+      var actorResult = game.physics.intersectSegmentIntoBoxes(
+        visionStart, visionDelta, actorArr);
 
       if (game.debugMode) {
-        var endPos = new Physics.Point(
+        var endPos = new Berzerk.Physics.Point(
           actor.curX + (actor.width / 2) + actor.eyeOffset.x,
           actor.curY + actor.eyeOffset.y);
         game.context.beginPath();
@@ -174,8 +207,8 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
       }
 
       if (actorResult && actorResult.hit && blockResult && blockResult.hit) {
-        var result = game.physics.checkNearestHit(this, blockResult,
-          actorResult);
+        var result = game.physics.checkNearestHit(
+          this, blockResult, actorResult);
         visible = result.targetHit;
       } else if (actorResult && actorResult.hit) {
         visible = true;
@@ -187,6 +220,74 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
       callback.call(this, actor);
     }
   }, this);
+};
+
+Actor.prototype.headLamp = function(game, elapsedTime) {
+  var pointArray = [];
+  var startingPoint = {};
+  var degreeToCurEndPoint;
+  var sweepAngle = 40;
+
+  startingPoint.x = this.curX + (this.width / 2);
+  startingPoint.y = this.curY + 14;
+
+  this.getTilesInFOV(game);
+  var initialEndpoint = {};
+
+  // Get our initial point that is straight ahead
+  if (this.dirX === -1 || this.dirX === 1) {
+    initialEndpoint = {x: (startingPoint.x + this.laserRange) * -this.dirX,
+                       y: startingPoint.y};
+  } else if (this.dirY === -1 || this.dirY === 1) {
+    initialEndpoint = {x: startingPoint.x,
+                       y: (startingPoint.y + this.laserRange) * -this.dirY};
+  }
+
+  var initalDelta = game.physics.getDelta(initialEndpoint.x, initialEndpoint.y,
+    startingPoint.x, startingPoint.y);
+  var degToInitialEndpos = game.physics.getTargetDegree(initalDelta);
+  var degreeToStartSweep = degToInitialEndpos - sweepAngle;
+  var degreeToEndSweep = degToInitialEndpos + sweepAngle;
+  initalDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
+  var initialResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
+    initalDelta, this.tilesInFOV);
+  var intialEndPos;
+  if (initialResult && initialResult.hit) {
+    // update end pos with hit pos
+    intialEndPos = new Berzerk.Physics.Point(
+      initialResult.hitPos.x, initialResult.hitPos.y);
+  } else {
+    intialEndPos = new Berzerk.Physics.Point(
+      initialEndpoint.x, initialEndpoint.y);
+  }
+
+  pointArray.push(intialEndPos);
+
+  var endingEndPos;
+  degreeToCurEndPoint = degreeToStartSweep;
+  while (degreeToCurEndPoint < degreeToEndSweep) {
+    degreeToCurEndPoint += 0.5;
+    var endingDelta = game.physics.degToPos(
+      degreeToCurEndPoint, this.laserRange);
+    var endingResult = game.physics.intersectSegmentIntoBoxes(
+      startingPoint, endingDelta, this.tilesInFOV);
+
+    if (endingResult && endingResult.hit) {
+      // update end pos with hit pos
+      endingEndPos = new Berzerk.Physics.Point(
+        endingResult.hitPos.x, endingResult.hitPos.y);
+      pointArray.push(endingEndPos);
+    }
+  }
+
+  game.contextFX.beginPath();
+  game.contextFX.moveTo(startingPoint.x, startingPoint.y);
+  for (var i = 0, li = pointArray.length; i < li; i++) {
+    game.contextFX.lineTo(pointArray[i].x, pointArray[i].y);
+  }
+  game.contextFX.closePath();
+  game.contextFX.fillStyle = 'rgba(255, 255, 255, .30)';
+  game.contextFX.fill();
 };
 
 Actor.prototype.update = function(game, elapsedTime) {
@@ -264,6 +365,8 @@ Actor.prototype.draw = function(game, elapsedTime) {
     game.context.drawImage(this.curImage, this.curX, this.curY,
       this.width, this.height);
   }
+
+  this.headLamp(game, elapsedTime);
 
   if (game.debugMode) {
     var x1 = this.curX;

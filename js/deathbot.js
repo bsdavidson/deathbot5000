@@ -13,7 +13,7 @@ window.addEventListener('load', function() {
   var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
   var game = window.deathbotGame = new Deathbot.Game(
-    canvas, canvasBG, 'orange');
+    canvas, canvasBG, '#CF9C59');
   game.loadImages();
 
   window.addEventListener('keydown', function(event) {
