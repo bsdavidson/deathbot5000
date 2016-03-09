@@ -1,9 +1,11 @@
 /*jshint browser:true */
-
-(function() {
 'use strict';
 
-var Deathbot = window.Deathbot = {};
+window.Deathbot = exports;
+exports.Game = require('./game').Game;
+exports.Player = require('./player').Player;
+exports.Monster = require('./monster').Monster;
+exports.Bullet = require('./bullet').Bullet;
 
 window.addEventListener('load', function() {
   // The Deathbot properties will be filled in by the other scripts. Even
@@ -12,7 +14,7 @@ window.addEventListener('load', function() {
 
   var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
-  var game = window.deathbotGame = new Deathbot.Game(
+  var game = window.deathbotGame = new exports.Game(
     canvas, canvasBG, '#CF9C59');
   game.loadImages();
 
@@ -66,4 +68,3 @@ window.addEventListener('load', function() {
   };
   tick();
 });
-}());

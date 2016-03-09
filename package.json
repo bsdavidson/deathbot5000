@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "description": "Thou art dead.",
   "scripts": {
+    "build": "browserify js/deathbot.js -o deathbot.js --debug",
     "start": "http-server",
     "test": "jscs js && jshint js",
-    "watch": "npm start & nodemon -e js -w js -x 'npm test'"
+    "watch": "npm start & nodemon -e js -w js -x 'npm run build && npm test'"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/bsdavidson/deathbot5000",
   "devDependencies": {
+    "browserify": "^13.0.0",
     "http-server": "^0.9.0",
     "jscs": "^2.11.0",
     "jshint": "^2.9.1",

@@ -1,9 +1,9 @@
 /*jshint browser:true */
-
-(function(Berzerk, Physics) {
 'use strict';
 
-var Actor = Berzerk.Actor = function Actor(
+var Physics = require('./physics').Physics;
+
+function Actor(
     image, startX, startY, scale, speedX, speedY, dirX, dirY) {
   if (arguments.length === 0) {
     return;
@@ -54,7 +54,8 @@ var Actor = Berzerk.Actor = function Actor(
   this.alpha = 1;
   this.debugColor = 'red';
   this.eyeOffset = {x: 0, y: 0};
-};
+}
+exports.Actor = Actor;
 
 Actor.DIR_UP = 0;
 Actor.DIR_DOWN = 1;
@@ -195,7 +196,7 @@ Actor.prototype.eachVisibleActor = function(game, actorConstructor, callback) {
         visionStart, visionDelta, actorArr);
 
       if (game.debugMode) {
-        var endPos = new Berzerk.Physics.Point(
+        var endPos = new Physics.Point(
           actor.curX + (actor.width / 2) + actor.eyeOffset.x,
           actor.curY + actor.eyeOffset.y);
         game.context.beginPath();
@@ -254,10 +255,10 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
   var intialEndPos;
   if (initialResult && initialResult.hit) {
     // update end pos with hit pos
-    intialEndPos = new Berzerk.Physics.Point(
+    intialEndPos = new Physics.Point(
       initialResult.hitPos.x, initialResult.hitPos.y);
   } else {
-    intialEndPos = new Berzerk.Physics.Point(
+    intialEndPos = new Physics.Point(
       initialEndpoint.x, initialEndpoint.y);
   }
 
@@ -274,7 +275,7 @@ Actor.prototype.headLamp = function(game, elapsedTime) {
 
     if (endingResult && endingResult.hit) {
       // update end pos with hit pos
-      endingEndPos = new Berzerk.Physics.Point(
+      endingEndPos = new Physics.Point(
         endingResult.hitPos.x, endingResult.hitPos.y);
       pointArray.push(endingEndPos);
     }
@@ -392,4 +393,3 @@ Actor.prototype.draw = function(game, elapsedTime) {
       this.curY + (this.height + 30));
   }
 };
-}(window.Berzerk, window.Berzerk.Physics));

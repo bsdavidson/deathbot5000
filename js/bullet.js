@@ -1,14 +1,16 @@
 /*jshint browser:true */
-
-(function(Deathbot, Actor) {
 'use strict';
 
-var Bullet = Deathbot.Bullet = function Bullet(
+var Actor = require('./berzerk').Actor;
+
+function Bullet(
     startX, startY, speed, dirX, dirY) {
   var image = {w: 5, h: 5};
   Actor.call(this, image, startX, startY, 100, speed, speed, dirX, dirY);
   this.deathTimer = 0;
-};
+}
+
+exports.Bullet = Bullet;
 
 Bullet.prototype = new Actor();
 Bullet.prototype.constructor = Bullet;
@@ -25,4 +27,3 @@ Bullet.prototype.update = function(game, elapsedTime) {
     this.active = false;
   }
 };
-}(window.Deathbot, window.Berzerk.Actor));

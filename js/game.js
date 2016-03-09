@@ -1,7 +1,12 @@
 /*jshint browser:true */
-
-(function(Deathbot, BerzerkGame, Keys, Physics) {
+/*globals SS:false */
 'use strict';
+
+var BerzerkGame = require('./berzerk').Game;
+var Keys = require('./berzerk').Keys;
+var Physics = require('./berzerk').Physics;
+var Player = require('./player').Player;
+var Monster = require('./monster').Monster;
 
 var DEBUG_TILE = 9;
 
@@ -51,7 +56,7 @@ var CHARACTERS = [
   }
 ];
 
-var Game = Deathbot.Game = function Game(canvas, canvasBG, fillStyle) {
+function Game(canvas, canvasBG, fillStyle) {
   BerzerkGame.call(this, canvas);
 
   this.playerDeathMethod = '';
@@ -89,8 +94,10 @@ var Game = Deathbot.Game = function Game(canvas, canvasBG, fillStyle) {
   this.defineKey('shootLeft', Keys.A);
   this.defineKey('shootDown', Keys.S);
   this.defineKey('shootRight', Keys.D);
-};
+}
 
+exports.Game = Game;
+console.log('Game');
 Game.prototype = new BerzerkGame();
 Game.prototype.constructor = Game;
 
@@ -128,7 +135,7 @@ Game.prototype.createSpawnPoints = function(actorWidth, actorHeight) {
 
 Game.prototype.randomizeSpawns = function() {
   this.eachActor(function(actor) {
-    if (!(actor instanceof Deathbot.Monster)) {
+    if (!(actor instanceof Monster)) {
       return;
     }
     actor.spawnPoints = this.createSpawnPoints(actor.width, actor.height);
@@ -175,15 +182,15 @@ Game.prototype.initialize = function(elapsedTime) {
   this.physics = new Physics(this);
   this.actors = {
     //image, startX, startY, scale, speedX, speedY, dirX, dirY
-    player: new Deathbot.Player(
+    player: new Player(
       this.images.player, 85, 454, 100, 150, 150, 1, 1),
-    deathbot1: new Deathbot.Monster(
+    deathbot1: new Monster(
       this.images.deathbot, 250, 500, 100, 100, 100, -1, 1),
-    deathbot3: new Deathbot.Monster(
+    deathbot3: new Monster(
       this.images.deathbot, 120, 110, 300, 110, 115, 1, 1),
-    deathbot4: new Deathbot.Monster(
+    deathbot4: new Monster(
       this.images.deathbot, 300, 200, 100, 200, 200, -1, -1),
-    deathbot5: new Deathbot.Monster(
+    deathbot5: new Monster(
       this.images.deathbot, 500, 400, 100, 200, 200, 1, 1)
   };
 
@@ -193,7 +200,7 @@ Game.prototype.initialize = function(elapsedTime) {
   this.score = 0;
 
   this.eachActor(function(actor) {
-    if (actor instanceof Deathbot.Monster) {
+    if (actor instanceof Monster) {
       this.numOfMonsters++;
     }
     actor.active = true;
@@ -344,7 +351,7 @@ Game.prototype.update = function(elapsedTime) {
       // positions rather than just reactivating the dead ones where they
       // fell.
       this.eachActor(function(actor) {
-        if (actor instanceof Deathbot.Monster) {
+        if (actor instanceof Monster) {
           this.numOfMonsters++;
           actor.active = true;
           actor.alpha = 1;
@@ -353,5 +360,3 @@ Game.prototype.update = function(elapsedTime) {
     }
   }
 };
-}(window.Deathbot, window.Berzerk.Game, window.Berzerk.Keys,
-  window.Berzerk.Physics));

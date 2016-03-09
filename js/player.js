@@ -1,15 +1,21 @@
 /*jshint browser:true */
-
-(function(Deathbot, Actor, Physics) {
+/*globals SS:false */
 'use strict';
 
-var Player = Deathbot.Player = function Player(
+var Deathbot = require('./deathbot');
+var Actor = require('./berzerk').Actor;
+var Physics = require('./berzerk').Physics;
+var Bullet = require('./bullet').Bullet;
+
+function Player(
     image, startX, startY, scale, speedX, speedY, dirX, dirY) {
   Actor.apply(this, arguments);
   this.health = 100;
   this.recoveryTimer = 2;
   this.eyeOffset = {x: 0, y: 10};
-};
+}
+
+exports.Player = Player;
 
 Player.prototype = new Actor();
 Player.prototype.constructor = Player;
@@ -160,7 +166,6 @@ Player.prototype.update = function(game, elapsedTime) {
 
 // startX, startY, speed, dirX, dirY
 Player.prototype.fireBullet = function(game, dirX, dirY) {
-  this.bullet = new Deathbot.Bullet(this.curX, this.curY + 20, 600, dirX, dirY);
+  this.bullet = new Bullet(this.curX, this.curY + 20, 600, dirX, dirY);
   game.actors.playerBullet = this.bullet;
 };
-}(window.Deathbot, window.Berzerk.Actor, window.Berzerk.Physics));

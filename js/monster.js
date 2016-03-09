@@ -1,9 +1,12 @@
 /*jshint browser:true */
-
-(function(Deathbot, Actor, Physics) {
 'use strict';
 
-var Monster = Deathbot.Monster = function Monster(
+var Actor = require('./berzerk').Actor;
+var Physics = require('./berzerk').Physics;
+var Player = require('./player').Player;
+var Bullet = require('./bullet').Bullet;
+
+function Monster(
     image, startX, startY, scale, speedX, speedY, dirX) {
   Actor.apply(this, arguments);
   this.dirTimer = 0;
@@ -12,7 +15,9 @@ var Monster = Deathbot.Monster = function Monster(
   this.laserRange = 3400;
   this.laserStart = {};
   this.eyeOffset = {x: 0, y: 14};
-};
+}
+
+exports.Monster = Monster;
 
 Monster.prototype = new Actor();
 Monster.prototype.constructor = Monster;
@@ -135,7 +140,7 @@ Monster.prototype.update = function(game, elapsedTime) {
     this.dirY = Actor.directions[nextDirection].y;
   }
   this.visibleActors = 0;
-  this.eachVisibleActor(game, Deathbot.Player, function(player) {
+  this.eachVisibleActor(game, Player, function(player) {
     this.visibleActors += 1;
     this.debugColor = 'white';
 
@@ -164,7 +169,7 @@ Monster.prototype.update = function(game, elapsedTime) {
     this.firing = false;
   }
 
-  this.eachOverlappingActor(game, Deathbot.Bullet, function(bullet) {
+  this.eachOverlappingActor(game, Bullet, function(bullet) {
     bullet.active = false;
     this.debugColor = 'green';
     this.active = false;
@@ -172,4 +177,3 @@ Monster.prototype.update = function(game, elapsedTime) {
     game.score++;
   });
 };
-}(window.Deathbot, window.Berzerk.Actor, window.Berzerk.Physics));

@@ -1,9 +1,9 @@
 /*jshint browser:true */
-
-(function(Berzerk, Physics) {
 'use strict';
 
-var Game = Berzerk.Game = function(canvas) {
+var Physics = require('./physics').Physics;
+
+function Game(canvas) {
   if (arguments.length === 0) {
     return;
   }
@@ -20,7 +20,8 @@ var Game = Berzerk.Game = function(canvas) {
   this.canvas.width = window.innerWidth;
   this.canvas.height = window.innerHeight;
   this.context = this.canvas.getContext('2d');
-};
+}
+exports.Game = Game;
 
 Game.prototype.defineKey = function(keyName, keyCode) {
   this.keyDown[keyName] = false;
@@ -190,4 +191,3 @@ Game.prototype.setFocus = function(event, isBlurred) {
     this.framesPerSecond = 30;
   }
 };
-}(window.Berzerk, window.Berzerk.Physics));
