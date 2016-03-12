@@ -1,7 +1,7 @@
 /*jshint browser:true */
 'use strict';
 
-var Physics = require('./physics').Physics;
+import {Physics} from './physics';
 
 export var Directions = {
   UP: 0,
@@ -44,6 +44,7 @@ export class Actor {
         up: image.up,
         down: image.down
       };
+      // console.log(this.dirImages);
       unscaledWidth = image.w;
       unscaledHeight = image.h;
     } else {

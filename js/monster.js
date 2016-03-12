@@ -2,9 +2,8 @@
 'use strict';
 
 import {Actor, Physics, Directions} from './berzerk';
-
-var Player = require('./player').Player;
-var Bullet = require('./bullet').Bullet;
+import {Player} from './player';
+import {Bullet} from './bullet';
 
 export class Monster extends Actor {
   constructor(image, startX, startY, scale, speedX, speedY, dirX, dirY) {

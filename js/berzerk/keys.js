@@ -1,7 +1,7 @@
 /* jshint browser:true */
 'use strict';
 
-exports.Keys = {
+export const Keys = {
   UP: 38,
   DOWN: 40,
   LEFT: 37,

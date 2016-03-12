@@ -1,14 +1,13 @@
 /*jshint browser:true */
 'use strict';
 
-var Physics = require('./physics').Physics;
+import {Physics} from './physics';
 
 export class Game {
   constructor(canvas) {
-    console.log('Canvas', canvas);
     this.mouse = {x: 0, y: 0};
     this.initialized = false;
-    this.debugMode = true;
+    this.debugMode = false;
     this.images = {};
     this.imagesLoaded = false;
     this.actors = {};
@@ -41,14 +40,13 @@ export class Game {
       let tempImage = new Image();
       let tempCanvas = document.createElement('canvas');
       let tempContext = tempCanvas.getContext('2d');
-      let encodedImage = tempCanvas.toDataURL();
       tempCanvas.width = w;
       tempCanvas.height = h;
       tempContext.translate(w, 0);
       tempContext.scale(-1, 1);
       tempContext.drawImage(src, 0, 0);
       tempImage.onload = onImageLoaded;
-      tempImage.src = encodedImage;
+      tempImage.src = tempCanvas.toDataURL();
       return tempImage;
     };
 
@@ -73,7 +71,6 @@ export class Game {
     };
 
     let onMainImageLoaded = function() {
-      console.log(this, this.width, this.height);
       this.rev = getReverseImage(this, this.width, this.height);
     };
 

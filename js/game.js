@@ -3,9 +3,9 @@
 'use strict';
 
 import {Game as BerzerkGame, Keys, Physics} from './berzerk';
+import {Player} from './player';
+import {Monster} from './monster';
 
-var Player = require('./player').Player;
-var Monster = require('./monster').Monster;
 const DEBUG_TILE = 9;
 const LEVELS = [
   {

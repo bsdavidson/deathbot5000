@@ -2,10 +2,10 @@
 'use strict';
 
 window.Deathbot = exports;
-exports.Game = require('./game').Game;
-exports.Player = require('./player').Player;
-exports.Monster = require('./monster').Monster;
-exports.Bullet = require('./bullet').Bullet;
+export {Game} from './game';
+export {Player} from './player';
+export {Monster} from './monster';
+export {Bullet} from './bullet';
 
 window.addEventListener('load', () => {
   // The Deathbot properties will be filled in by the other scripts. Even
@@ -14,10 +14,8 @@ window.addEventListener('load', () => {
 
   var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
-  console.log('before game init');
   var game = window.deathbotGame = new exports.Game(
     canvas, canvasBG, '#CF9C59');
-  console.log('after');
   game.loadImages();
 
   window.addEventListener('keydown', (event) => {

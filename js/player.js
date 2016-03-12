@@ -2,10 +2,9 @@
 /*globals SS:false */
 'use strict';
 
-var Deathbot = require('./deathbot');
-var Actor = require('./berzerk').Actor;
-var Physics = require('./berzerk').Physics;
-var Bullet = require('./bullet').Bullet;
+import * as deathbot from './deathbot';
+import {Actor, Physics} from './berzerk';
+import {Bullet} from './bullet';
 
 export class Player extends Actor{
   constructor(image, startX, startY, scale, speedX, speedY, dirX, dirY) {
@@ -41,7 +40,7 @@ export class Player extends Actor{
       if (game.score > lowestScore) {
         let playerName = prompt('Please Enter your Name.');
         SS.submitScore(playerName, game.score);
-        Deathbot.scores = SS.getScores(8);
+        deathbot.scores = SS.getScores(8);
       }
     }
 
@@ -150,7 +149,7 @@ export class Player extends Actor{
       }
     }
 
-    this.eachOverlappingActor(game, Deathbot.Monster, function(actor) {
+    this.eachOverlappingActor(game, deathbot.Monster, function(actor) {
       this.debugColor = 'white';
       this.health -= 20;
       if (this.health <= 0) {
