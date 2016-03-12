@@ -1,6 +1,7 @@
-/* jshint browser:true */
+/*jshint browser:true */
 'use strict';
-exports.Physics = require('./physics').Physics;
-exports.Actor = require('./actor').Actor;
-exports.Keys = require('./keys').Keys;
-exports.Game = require('./game').Game;
+
+export {Physics} from './physics';
+export {Keys} from './keys';
+export {Game} from './game';
+export {Actor, Directions} from './actor';

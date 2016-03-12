@@ -8,6 +8,7 @@
   "plusplus": false,
   "node": true,
   "devel": true,
+  "esversion": 6,
   "globals": {
     "after": false,
     "afterEach": false,

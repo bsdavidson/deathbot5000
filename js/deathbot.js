@@ -7,26 +7,28 @@ exports.Player = require('./player').Player;
 exports.Monster = require('./monster').Monster;
 exports.Bullet = require('./bullet').Bullet;
 
-window.addEventListener('load', function() {
+window.addEventListener('load', () => {
   // The Deathbot properties will be filled in by the other scripts. Even
   // though they don't look like they exist at this point, they will by the
   // time the window load event has fired.
 
   var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
+  console.log('before game init');
   var game = window.deathbotGame = new exports.Game(
     canvas, canvasBG, '#CF9C59');
+  console.log('after');
   game.loadImages();
 
-  window.addEventListener('keydown', function(event) {
+  window.addEventListener('keydown', (event) => {
     game.onKeyDown(event);
   });
 
-  window.addEventListener('keyup', function(event) {
+  window.addEventListener('keyup', (event) => {
     game.onKeyUp(event);
   });
 
-  window.addEventListener('mousemove', function(event) {
+  window.addEventListener('mousemove', (event) => {
     game.onMouseMove(event);
   });
 
@@ -59,7 +61,7 @@ window.addEventListener('load', function() {
   };
 
   var oldFrameTime = (new Date().getTime() / 1000);
-  var tick = function() {
+  var tick = () => {
     var newFrameTime = (new Date().getTime() / 1000);
     var elapsedTime = newFrameTime - oldFrameTime;
     oldFrameTime = newFrameTime;
