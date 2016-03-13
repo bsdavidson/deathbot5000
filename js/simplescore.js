@@ -23,7 +23,7 @@
     },
     getScores: function(maxScores) {
       var xmlhttp = new XMLHttpRequest();
-      xmlhttp.onreadystatechange = function() {
+      xmlhttp.onreadystatechange = () => {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
           SS.scores = xmlhttp.responseText;
           SS.scores = JSON.parse(SS.scores);

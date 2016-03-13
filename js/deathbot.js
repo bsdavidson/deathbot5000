@@ -31,7 +31,7 @@ window.addEventListener('load', () => {
   });
 
   var blurred = false;
-  var setFocus = function(event) {
+  var setFocus = (event) => {
     if (event) {
       if (event.type === 'blur') {
         blurred = true;
@@ -47,7 +47,7 @@ window.addEventListener('load', () => {
   window.addEventListener('visibilitychange', setFocus, true);
 
   var resizeTimeout;
-  window.onresize = function(event) {
+  window.onresize = (event) => {
     if (resizeTimeout) {
       clearTimeout(resizeTimeout);
       resizeTimeout = null;
