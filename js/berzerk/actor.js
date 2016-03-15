@@ -235,7 +235,6 @@ export class Actor {
     let tilesInFOV = this.getTilesInFOV(game);
     // console.log(tilesInFOV);
     let initialEndpoint = {};
-
     // Get our initial point that is straight ahead
     if (this.dirX === -1 || this.dirX === 1) {
       initialEndpoint = {x: (startingPoint.x + this.laserRange) * -this.dirX,
@@ -266,8 +265,6 @@ export class Actor {
     }
 
     pointArray.push(intialEndPos);
-
-
     let endingEndPos;
     degreeToCurEndPoint = degreeToStartSweep;
     while (degreeToCurEndPoint < degreeToEndSweep) {
