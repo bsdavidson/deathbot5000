@@ -1,6 +1,7 @@
-/* jshint browser:true */
+/*jshint browser:true */
+'use strict';
 
-(function() {
-  'use strict';
-  window.Berzerk = {};
-}());
+export {Physics} from './physics';
+export {Keys} from './keys';
+export {Game} from './game';
+export {Actor, Directions} from './actor';

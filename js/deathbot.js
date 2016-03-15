@@ -1,35 +1,37 @@
 /*jshint browser:true */
-
-(function() {
 'use strict';
 
-var Deathbot = window.Deathbot = {};
+window.Deathbot = exports;
+export {Game} from './game';
+export {Player} from './player';
+export {Monster} from './monster';
+export {Bullet} from './bullet';
 
-window.addEventListener('load', function() {
+window.addEventListener('load', () => {
   // The Deathbot properties will be filled in by the other scripts. Even
   // though they don't look like they exist at this point, they will by the
   // time the window load event has fired.
 
   var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
-  var game = window.deathbotGame = new Deathbot.Game(
-    canvas, canvasBG, '#CF9C59');
+  var game = window.deathbotGame = new exports.Game(
+    canvas, canvasBG, '#111');
   game.loadImages();
 
-  window.addEventListener('keydown', function(event) {
+  window.addEventListener('keydown', (event) => {
     game.onKeyDown(event);
   });
 
-  window.addEventListener('keyup', function(event) {
+  window.addEventListener('keyup', (event) => {
     game.onKeyUp(event);
   });
 
-  window.addEventListener('mousemove', function(event) {
+  window.addEventListener('mousemove', (event) => {
     game.onMouseMove(event);
   });
 
   var blurred = false;
-  var setFocus = function(event) {
+  var setFocus = (event) => {
     if (event) {
       if (event.type === 'blur') {
         blurred = true;
@@ -45,7 +47,7 @@ window.addEventListener('load', function() {
   window.addEventListener('visibilitychange', setFocus, true);
 
   var resizeTimeout;
-  window.onresize = function(event) {
+  window.onresize = (event) => {
     if (resizeTimeout) {
       clearTimeout(resizeTimeout);
       resizeTimeout = null;
@@ -57,7 +59,7 @@ window.addEventListener('load', function() {
   };
 
   var oldFrameTime = (new Date().getTime() / 1000);
-  var tick = function() {
+  var tick = () => {
     var newFrameTime = (new Date().getTime() / 1000);
     var elapsedTime = newFrameTime - oldFrameTime;
     oldFrameTime = newFrameTime;
@@ -66,4 +68,3 @@ window.addEventListener('load', function() {
   };
   tick();
 });
-}());

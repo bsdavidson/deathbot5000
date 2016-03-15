@@ -1,9 +1,7 @@
 /* jshint browser:true */
-
-(function(Berzerk) {
 'use strict';
 
-var Keys = Berzerk.Keys = {
+export const Keys = {
   UP: 38,
   DOWN: 40,
   LEFT: 37,
@@ -14,4 +12,3 @@ var Keys = Berzerk.Keys = {
   D: 68,
   SPACE: 32
 };
-}(window.Berzerk));

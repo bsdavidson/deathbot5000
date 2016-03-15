@@ -1,11 +1,10 @@
 /*jshint browser:true */
-
-(function(Berzerk) {
 'use strict';
 
-var Physics = Berzerk.Physics = function Physics(game) {
+function Physics(game) {
   this.game = game;
-};
+}
+exports.Physics = Physics;
 
 Physics.EPSILON = 1 / 32;
 
@@ -273,4 +272,3 @@ Physics.prototype.degToPos = function(degree, radius) {
   };
   return result;
 };
-}(window.Berzerk));
