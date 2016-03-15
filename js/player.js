@@ -35,13 +35,13 @@ export class Player extends Actor{
         this.bullet = null;
         delete game.actors.playerBullet;
       }
-      let lowestScore = SS.currentScores && SS.currentScores.length ?
-        SS.currentScores[SS.currentScores.length - 1].score : 0;
-      if (game.score > lowestScore) {
-        let playerName = prompt('Please Enter your Name.');
-        SS.submitScore(playerName, game.score);
-        deathbot.scores = SS.getScores(8);
-      }
+      // let lowestScore = SS.currentScores && SS.currentScores.length ?
+      //   SS.currentScores[SS.currentScores.length - 1].score : 0;
+      // if (game.score > lowestScore) {
+      //   let playerName = prompt('Please Enter your Name.');
+      //   SS.submitScore(playerName, game.score);
+      //   deathbot.scores = SS.getScores(8);
+      // }
     }
 
     if (game.gameState === 'attract') {

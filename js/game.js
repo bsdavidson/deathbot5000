@@ -214,15 +214,15 @@ export class Game extends BerzerkGame {
   leaderboard() {
     let yPos = 60;
     let xPos = 940;
-    if (SS.currentScores) {
-      this.drawScores('***** Hi Scores *****', yPos, xPos, 20);
-      yPos += 30;
-      let lb = SS.currentScores;
-      for (let i = 0; i < lb.length; i++) {
-        this.drawScores(lb[i].name + '  ' +  lb[i].score, yPos, xPos, 20);
-        yPos += 30;
-      }
-    }
+    // if (SS.currentScores) {
+    //   this.drawScores('***** Hi Scores *****', yPos, xPos, 20);
+    //   yPos += 30;
+    //   let lb = SS.currentScores;
+    //   for (let i = 0; i < lb.length; i++) {
+    //     this.drawScores(lb[i].name + '  ' +  lb[i].score, yPos, xPos, 20);
+    //     yPos += 30;
+    //   }
+    // }
   }
 
   draw(elapsedTime) {
