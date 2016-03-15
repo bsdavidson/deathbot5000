@@ -12,7 +12,7 @@ export class Monster extends Actor {
     this.dirTimer = 0;
     this.isFiring = false;
     this.laserDelta = {};
-    this.laserRange = 3400;
+    this.laserRange = 500;
     this.laserStart = {};
     this.eyeOffset = {x: 0, y: 14};
   }

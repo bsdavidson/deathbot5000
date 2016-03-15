@@ -80,6 +80,9 @@ export class Actor {
     this.alpha = 1;
     this.debugColor = 'red';
     this.eyeOffset = {x: 0, y: 0};
+    this.laserDelta = {};
+    this.laserRange = 3400;
+    this.laserStart = {};
   }
 
   collidesWithWalls(game) {
@@ -125,7 +128,7 @@ export class Actor {
   }
 
   getTilesInFOV(game) {
-    this.tilesInFOV = [];
+    let tilesInFOV = [];
     let blocks = game.staticBlocks;
     for (let i = 0, li = blocks.length; i < li; i++) {
       let visionDelta = {
@@ -139,9 +142,10 @@ export class Actor {
       blockDir.y = visionDelta.y / blockDirLength;
       let dotProduct = (this.dirX * blockDir.x) + (this.dirY * blockDir.y);
       if (dotProduct > 0.70) {
-        this.tilesInFOV.push(game.staticBlocks[i]);
+        tilesInFOV.push(game.staticBlocks[i]);
       }
     }
+    return tilesInFOV;
   }
 
   eachVisibleActor(game, actorConstructor, callback) {
@@ -228,7 +232,8 @@ export class Actor {
     startingPoint.x = this.curX + (this.width / 2);
     startingPoint.y = this.curY + 14;
 
-    this.getTilesInFOV(game);
+    let tilesInFOV = this.getTilesInFOV(game);
+    // console.log(tilesInFOV);
     let initialEndpoint = {};
 
     // Get our initial point that is straight ahead
@@ -249,7 +254,7 @@ export class Actor {
     let degreeToEndSweep = degToInitialEndpos + sweepAngle;
     initalDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
     let initialResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
-      initalDelta, this.tilesInFOV);
+      initalDelta, tilesInFOV);
     let intialEndPos;
     if (initialResult && initialResult.hit) {
       // update end pos with hit pos
@@ -262,6 +267,7 @@ export class Actor {
 
     pointArray.push(intialEndPos);
 
+
     let endingEndPos;
     degreeToCurEndPoint = degreeToStartSweep;
     while (degreeToCurEndPoint < degreeToEndSweep) {
@@ -269,7 +275,7 @@ export class Actor {
       let endingDelta = game.physics.degToPos(
         degreeToCurEndPoint, this.laserRange);
       let endingResult = game.physics.intersectSegmentIntoBoxes(
-        startingPoint, endingDelta, this.tilesInFOV);
+        startingPoint, endingDelta, tilesInFOV);
 
       if (endingResult && endingResult.hit) {
         // update end pos with hit pos
@@ -367,7 +373,7 @@ export class Actor {
         this.width, this.height);
     }
 
-    this.headLamp(game, elapsedTime);
+    // this.headLamp(game, elapsedTime);
 
     if (game.debugMode) {
       let x1 = this.curX;

@@ -15,7 +15,7 @@ window.addEventListener('load', () => {
   var canvas = document.querySelector('#deathbot');
   var canvasBG = document.querySelector('#background');
   var game = window.deathbotGame = new exports.Game(
-    canvas, canvasBG, '#CF9C59');
+    canvas, canvasBG, '#111');
   game.loadImages();
 
   window.addEventListener('keydown', (event) => {

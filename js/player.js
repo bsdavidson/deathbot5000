@@ -65,18 +65,22 @@ export class Player extends Actor{
 
     if (game.keyDown.up) {
       dirY = -1;
+      this.dirX = 0;
       this.dirY = dirY;
     }
     if (game.keyDown.down) {
       dirY = 1;
+      this.dirX = 0;
       this.dirY = dirY;
     }
     if (game.keyDown.left) {
       dirX = -1;
+      this.dirY = 0;
       this.dirX = dirX;
     }
     if (game.keyDown.right) {
       dirX = 1;
+      this.dirY = 0;
       this.dirX = dirX;
     }
     if (this.bullet) {
@@ -156,6 +160,7 @@ export class Player extends Actor{
         game.playerDeathMethod = 'dead';
       }
     });
+    this.headLamp(game, elapsedTime);
   }
 
   // startX, startY, speed, dirX, dirY
