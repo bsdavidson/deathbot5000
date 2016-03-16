@@ -81,7 +81,7 @@ export class Actor {
     this.debugColor = 'red';
     this.eyeOffset = {x: 0, y: 0};
     this.laserDelta = {};
-    this.laserRange = 3400;
+    this.laserRange = 9400;
     this.laserStart = {};
   }
 
