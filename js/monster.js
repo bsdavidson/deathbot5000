@@ -1,7 +1,7 @@
 /*jshint browser:true */
 'use strict';
 
-import {Actor, Physics, Directions} from './berzerk';
+import {Actor, Physics, Point, Directions} from './berzerk';
 import {Player} from './player';
 import {Bullet} from './bullet';
 
@@ -12,7 +12,7 @@ export class Monster extends Actor {
     this.dirTimer = 0;
     this.isFiring = false;
     this.laserDelta = {};
-    this.laserRange = 500;
+    this.laserRange = 1200;
     this.laserStart = {};
     this.eyeOffset = {x: 0, y: 14};
   }
@@ -67,15 +67,15 @@ export class Monster extends Actor {
     } else {
       if (blockResult && blockResult.hit) {
         // update end pos with hit pos
-        endPos = new Physics.Point(blockResult.hitPos.x,
+        endPos = new Point(blockResult.hitPos.x,
           blockResult.hitPos.y);
         game.context.strokeStyle = 'red';
       } else if (targetResult && targetResult.hit) {
-        endPos = new Physics.Point(targetResult.hitPos.x,
+        endPos = new Point(targetResult.hitPos.x,
           targetResult.hitPos.y);
         targetHit = true;
       } else {
-        endPos = new Physics.Point(laserEndpoint.x, laserEndpoint.y);
+        endPos = new Point(laserEndpoint.x, laserEndpoint.y);
       }
     }
 
@@ -116,9 +116,11 @@ export class Monster extends Actor {
         this.laserDelta = game.physics.degToPos(newDegree, this.laserRange);
       }
     } else {
-      player.recoveryTimer = 0;
-      player.health -= 2;
-      game.playerDeathMethod = 'blind';
+      if (!game.debugMode) {
+        player.recoveryTimer = 0;
+        player.health -= 2;
+        game.playerDeathMethod = 'blind';
+      }
     }
   }
 

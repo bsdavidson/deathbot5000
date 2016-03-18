@@ -1,7 +1,7 @@
 /*jshint browser:true */
 'use strict';
 
-import {Physics} from './physics';
+import {Physics, Box, Point, EPSILON} from './physics';
 
 export var Directions = {
   UP: 0,
@@ -89,22 +89,22 @@ export class Actor {
     let result = {hit: false, dirX: 0, dirY: 0};
     // Hit the Left Wall
     if (this.curX < 0) {
-      this.curX = Physics.EPSILON;
+      this.curX = EPSILON;
       result = {hit: true, dirX: 1};
     }
     // Hit right wall
     if (this.curX > (game.canvas.width - this.width)) {
-      this.curX = (game.canvas.width - this.width) - Physics.EPSILON;
+      this.curX = (game.canvas.width - this.width) - EPSILON;
       result = {hit: true, dirX: -1};
     }
     // Hit the Ceiling
     if (this.curY < 0) {
-      this.curY = Physics.EPSILON;
+      this.curY = EPSILON;
       result = {hit: true, dirY: 1};
     }
     // Hit the Floor
     if (this.curY > game.canvas.height - this.height) {
-      this.curY = (game.canvas.height - this.height) - Physics.EPSILON;
+      this.curY = (game.canvas.height - this.height) - EPSILON;
       result = {hit: true, dirY: -1};
     }
     return result;
@@ -196,7 +196,7 @@ export class Actor {
           visionStart, visionDelta, actorArr);
 
         if (game.debugMode) {
-          let endPos = new Physics.Point(
+          let endPos = new Point(
             actor.curX + (actor.width / 2) + actor.eyeOffset.x,
             actor.curY + actor.eyeOffset.y);
           game.context.beginPath();
@@ -228,6 +228,9 @@ export class Actor {
     let startingPoint = {};
     let degreeToCurEndPoint;
     let sweepAngle = 40;
+    let gridSize = {w: 28, h: 28};
+    let cellSize = 32;
+    let dir = {x: this.dirX, y: this.dirY};
 
     startingPoint.x = this.curX + (this.width / 2);
     startingPoint.y = this.curY + 14;
@@ -248,38 +251,48 @@ export class Actor {
                                             initialEndpoint.y,
                                             startingPoint.x,
                                             startingPoint.y);
+
     let degToInitialEndpos = game.physics.getTargetDegree(initalDelta);
     let degreeToStartSweep = degToInitialEndpos - sweepAngle;
     let degreeToEndSweep = degToInitialEndpos + sweepAngle;
     initalDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
+
     let initialResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
       initalDelta, tilesInFOV);
     let intialEndPos;
     if (initialResult && initialResult.hit) {
       // update end pos with hit pos
-      intialEndPos = new Physics.Point(
+      intialEndPos = new Point(
         initialResult.hitPos.x, initialResult.hitPos.y);
     } else {
-      intialEndPos = new Physics.Point(
+      intialEndPos = new Point(
         initialEndpoint.x, initialEndpoint.y);
     }
 
     pointArray.push(intialEndPos);
+
     let endingEndPos;
     degreeToCurEndPoint = degreeToStartSweep;
-    while (degreeToCurEndPoint < degreeToEndSweep) {
-      degreeToCurEndPoint += 0.5;
-      let endingDelta = game.physics.degToPos(
-        degreeToCurEndPoint, this.laserRange);
-      let endingResult = game.physics.intersectSegmentIntoBoxes(
-        startingPoint, endingDelta, tilesInFOV);
 
-      if (endingResult && endingResult.hit) {
-        // update end pos with hit pos
-        endingEndPos = new Physics.Point(
-          endingResult.hitPos.x, endingResult.hitPos.y);
-        pointArray.push(endingEndPos);
-      }
+    while (degreeToCurEndPoint < degreeToEndSweep) {
+      let xxx = degreeToCurEndPoint == degreeToStartSweep;
+      degreeToCurEndPoint += 0.5;
+      let endingDelta = game.physics.degToPos(degreeToCurEndPoint,
+                                              this.laserRange);
+      game.physics.getFirstCollision(startingPoint, cellSize, endingDelta,
+        (cellx, celly) => {
+          let gridPos = (celly * game.cols) + cellx;
+          let block = game.staticGrid[gridPos];
+          if (block) {
+            let endingResult = game.physics.intersectSegmentIntoBox(
+              startingPoint, endingDelta, block);
+            if (endingResult && endingResult.hit) {
+              endingEndPos = new Point(
+              endingResult.hitPos.x, endingResult.hitPos.y);
+              pointArray.push(endingEndPos);
+              return false;
+            }}
+        });
     }
 
     game.contextFX.beginPath();
@@ -302,7 +315,7 @@ export class Actor {
     }
 
     if (this.moving) {
-      let movingBox = new Physics.Box(this.curX, this.curY, this.width,
+      let movingBox = new Box(this.curX, this.curY, this.width,
         this.height);
       let segmentDelta = {
         x: (this.speedX * elapsedTime) * this.dirX,

@@ -3,7 +3,7 @@
 'use strict';
 
 import * as deathbot from './deathbot';
-import {Actor, Physics} from './berzerk';
+import {Actor, Physics, Box, Point, LEVELS} from './berzerk';
 import {Bullet} from './bullet';
 
 export class Player extends Actor{
@@ -114,7 +114,7 @@ export class Player extends Actor{
       this.facing = 'right';
     }
 
-    let movingBox = new Physics.Box(this.curX, this.curY, this.width,
+    let movingBox = new Box(this.curX, this.curY, this.width,
       this.height);
     let segmentDelta = {
       x: (this.speedX * elapsedTime) * dirX,
@@ -155,11 +155,15 @@ export class Player extends Actor{
 
     this.eachOverlappingActor(game, deathbot.Monster, function(actor) {
       this.debugColor = 'white';
-      this.health -= 20;
+      if (!game.debugMode) {
+        this.health -= 20;
+      }
       if (this.health <= 0) {
         game.playerDeathMethod = 'dead';
       }
     });
+
+    // console.log(this.curX, this.curY);
     this.headLamp(game, elapsedTime);
   }
 

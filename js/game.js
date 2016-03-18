@@ -2,12 +2,12 @@
 /*globals SS:false */
 'use strict';
 
-import {Game as BerzerkGame, Keys, Physics} from './berzerk';
+import {Game as BerzerkGame, Keys, Physics, Box, EPSILON} from './berzerk';
 import {Player} from './player';
 import {Monster} from './monster';
 
 const DEBUG_TILE = 9;
-const LEVELS = [
+export const LEVELS = [
   {
     cols: 28,
     rows: 28,
@@ -69,6 +69,7 @@ export class Game extends BerzerkGame {
     this.grid = LEVELS[0].grid;
     this.spawnGrid = [];
     this.staticBlocks = [];
+    this.staticGrid = [];
     this.fillStyle = fillStyle;
     this.canvasBG = canvasBG;
     this.canvasBG.width = window.innerWidth;
@@ -134,8 +135,8 @@ export class Game extends BerzerkGame {
       let spawnIndex = actor.spawnPoints[
       Math.floor(Math.random() * actor.spawnPoints.length)];
       let spawnXY = this.calcGridXY(spawnIndex);
-      actor.curX = spawnXY.x1 + Physics.EPSILON;
-      actor.curY = spawnXY.y1 + Physics.EPSILON;
+      actor.curX = spawnXY.x1 + EPSILON;
+      actor.curY = spawnXY.y1 + EPSILON;
     },this);
   }
 
@@ -171,6 +172,7 @@ export class Game extends BerzerkGame {
 
     this.drawBackground(elapsedTime);
     this.staticBlocks = [];
+    this.staticGrid = [];
     this.physics = new Physics(this);
     this.actors = {
       //image, startX, startY, scale, speedX, speedY, dirX, dirY
@@ -202,9 +204,12 @@ export class Game extends BerzerkGame {
     for (let i = 0, li = this.grid.length; li > i; i++) {
       if (this.grid[i]) {
         let blockXY = this.calcGridXY(i);
-        let block = new Physics.Box(
+        let block = new Box(
           blockXY.x1, blockXY.y1, this.cellWidth, this.cellHeight);
         this.staticBlocks.push(block);
+        this.staticGrid.push(block);
+      } else {
+        this.staticGrid.push(null);
       }
     }
 
