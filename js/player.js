@@ -12,6 +12,7 @@ export class Player extends Actor{
     this.health = 100;
     this.recoveryTimer = 2;
     this.eyeOffset = {x: 0, y: 10};
+    this.headLampActive = true;
   }
 
   draw(game, elapsedTime) {
@@ -21,9 +22,9 @@ export class Player extends Actor{
     if (this.bullet) {
       this.bullet.draw(game, elapsedTime);
     }
-    let healthVis = ((100 - this.health) / 100);
-    game.context.fillStyle = 'rgba(0,0,0,' + healthVis + ')';
-    game.context.fillRect(0, 0, game.canvas.width, game.canvas.height);
+    // let healthVis = ((100 - this.health) / 100);
+    // game.context.fillStyle = 'rgba(0,0,0,' + healthVis + ')';
+    // game.context.fillRect(0, 0, game.canvas.width, game.canvas.height);
   }
 
   update(game, elapsedTime) {
@@ -164,7 +165,7 @@ export class Player extends Actor{
     });
 
     // console.log(this.curX, this.curY);
-    this.headLamp(game, elapsedTime);
+    // this.headLamp(game, elapsedTime);
   }
 
   // startX, startY, speed, dirX, dirY

@@ -127,27 +127,6 @@ export class Actor {
     }, this);
   }
 
-  getTilesInFOV(game) {
-    let tilesInFOV = [];
-    let blocks = game.staticBlocks;
-    for (let i = 0, li = blocks.length; i < li; i++) {
-      let visionDelta = {
-        x: (blocks[i].x) - this.curX,
-        y: (blocks[i].y) - this.curY
-      };
-      let blockDirLength = Math.sqrt(visionDelta.x * visionDelta.x +
-        visionDelta.y * visionDelta.y);
-      let blockDir = {};
-      blockDir.x = visionDelta.x / blockDirLength;
-      blockDir.y = visionDelta.y / blockDirLength;
-      let dotProduct = (this.dirX * blockDir.x) + (this.dirY * blockDir.y);
-      if (dotProduct > 0.70) {
-        tilesInFOV.push(game.staticBlocks[i]);
-      }
-    }
-    return tilesInFOV;
-  }
-
   eachVisibleActor(game, actorConstructor, callback) {
     game.eachActor(function(actor) {
       if (!(actor instanceof actorConstructor)) {
@@ -223,20 +202,17 @@ export class Actor {
     }, this);
   }
 
-  headLamp(game, elapsedTime) {
+  headLamp(game, elapsedTime, angle = 45, power = 800) {
     let pointArray = [];
     let startingPoint = {};
     let degreeToCurEndPoint;
-    let sweepAngle = 40;
+    let sweepAngle = angle;
     let gridSize = {w: 28, h: 28};
     let cellSize = 32;
     let dir = {x: this.dirX, y: this.dirY};
 
     startingPoint.x = this.curX + (this.width / 2);
     startingPoint.y = this.curY + 14;
-
-    let tilesInFOV = this.getTilesInFOV(game);
-    // console.log(tilesInFOV);
     let initialEndpoint = {};
     // Get our initial point that is straight ahead
     if (this.dirX === -1 || this.dirX === 1) {
@@ -244,39 +220,28 @@ export class Actor {
                          y: startingPoint.y};
     } else if (this.dirY === -1 || this.dirY === 1) {
       initialEndpoint = {x: startingPoint.x,
-                         y: (startingPoint.y + this.laserRange) * -this.dirY};
+                        y: (startingPoint.y + this.laserRange) * -this.dirY};
     }
 
-    let initalDelta = game.physics.getDelta(initialEndpoint.x,
+    // Using the Mouse
+    // initialEndpoint = {x: (this.curX - game.mouse.x) * this.laserRange,
+    //                    y: (this.curY - game.mouse.y) * this.laserRange};
+
+    let initialDelta = game.physics.getDelta(initialEndpoint.x,
                                             initialEndpoint.y,
                                             startingPoint.x,
                                             startingPoint.y);
-
-    let degToInitialEndpos = game.physics.getTargetDegree(initalDelta);
+    let degToInitialEndpos = game.physics.getTargetDegree(initialDelta);
     let degreeToStartSweep = degToInitialEndpos - sweepAngle;
     let degreeToEndSweep = degToInitialEndpos + sweepAngle;
-    initalDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
-
-    let initialResult = game.physics.intersectSegmentIntoBoxes(startingPoint,
-      initalDelta, tilesInFOV);
-    let intialEndPos;
-    if (initialResult && initialResult.hit) {
-      // update end pos with hit pos
-      intialEndPos = new Point(
-        initialResult.hitPos.x, initialResult.hitPos.y);
-    } else {
-      intialEndPos = new Point(
-        initialEndpoint.x, initialEndpoint.y);
-    }
-
-    pointArray.push(intialEndPos);
+    initialDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
 
     let endingEndPos;
     degreeToCurEndPoint = degreeToStartSweep;
 
     while (degreeToCurEndPoint < degreeToEndSweep) {
       let xxx = degreeToCurEndPoint == degreeToStartSweep;
-      degreeToCurEndPoint += 0.5;
+      degreeToCurEndPoint += 0.2;
       let endingDelta = game.physics.degToPos(degreeToCurEndPoint,
                                               this.laserRange);
       game.physics.getFirstCollision(startingPoint, cellSize, endingDelta,
@@ -295,14 +260,20 @@ export class Actor {
         });
     }
 
-    game.contextFX.beginPath();
-    game.contextFX.moveTo(startingPoint.x, startingPoint.y);
+    let lightCtx = game.context;
+    lightCtx.beginPath();
+    lightCtx.moveTo(startingPoint.x, startingPoint.y);
     for (let i = 0, li = pointArray.length; i < li; i++) {
-      game.contextFX.lineTo(pointArray[i].x, pointArray[i].y);
+      lightCtx.lineTo(pointArray[i].x, pointArray[i].y);
     }
-    game.contextFX.closePath();
-    game.contextFX.fillStyle = 'rgba(255, 255, 255, .30)';
-    game.contextFX.fill();
+    lightCtx.closePath();
+    let grd = lightCtx.createRadialGradient(this.curX,this.curY,power,
+                                                  this.curX,this.curY,0);
+    grd.addColorStop(0, 'transparent');
+    grd.addColorStop(0.8, 'rgba(255,255,255,0.3)');
+    grd.addColorStop(1, 'rgba(255,255,255,0.5)');
+    lightCtx.fillStyle = grd;
+    lightCtx.fill();
   }
 
   update(game, elapsedTime) {
@@ -341,6 +312,12 @@ export class Actor {
     // Image Switcher
     this.facing = Directions.getName(this.dirX, this.dirY);
     this.curImage = this.dirImages[this.facing];
+  }
+
+  preDraw(game, elapsedTime) {
+    if (this.active && this.headLampActive === true) {
+      this.headLamp(game, elapsedTime, this.headLampAngle, this.headLampPower);
+    }
   }
 
   draw(game, elapsedTime) {
@@ -382,8 +359,6 @@ export class Actor {
       game.context.drawImage(this.curImage, this.curX, this.curY,
         this.width, this.height);
     }
-
-    // this.headLamp(game, elapsedTime);
 
     if (game.debugMode) {
       let x1 = this.curX;

@@ -15,6 +15,7 @@ export class Monster extends Actor {
     this.laserRange = 1200;
     this.laserStart = {};
     this.eyeOffset = {x: 0, y: 14};
+    this.headLampActive = true;
   }
 
   draw(game, elapsedTime) {
@@ -82,13 +83,13 @@ export class Monster extends Actor {
     let degToEndpos = game.physics.getTargetDegree(this.laserDelta);
     let degToTarget = game.physics.getTargetDegree(targetDelta);
 
-    game.context.beginPath();
-    game.context.moveTo(this.laserStart.x, this.laserStart.y);
-    game.context.lineTo(endPos.x, endPos.y);
-    game.context.closePath();
-    game.context.strokeStyle = targetResult &&
+    game.contextFX.beginPath();
+    game.contextFX.moveTo(this.laserStart.x, this.laserStart.y);
+    game.contextFX.lineTo(endPos.x, endPos.y);
+    game.contextFX.closePath();
+    game.contextFX.strokeStyle = targetResult &&
                                targetResult.hit ? 'red' : 'blue';
-    game.context.stroke();
+    game.contextFX.stroke();
 
     if (!targetHit) {
       let newDegree;

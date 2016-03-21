@@ -123,10 +123,20 @@ export class Game {
   }
 
   draw(elapsedTime) {
+    this.context.globalAlpha = 1;
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // this.context.fillStyle = 'rgba(0,0,0,1.0)';
+    // this.context.fillRect(0, 0, this.canvas.width, this.canvas.height / 2);
+
+    this.eachActor(function(actor) {
+      actor.preDraw(this, elapsedTime);
+    }, this);
+    this.context.globalCompositeOperation="source-atop";
     this.eachActor(function(actor) {
       actor.draw(this, elapsedTime);
     }, this);
+    this.context.globalCompositeOperation="source-over";
+
   }
 
   drawLoading() {}

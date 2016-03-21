@@ -245,52 +245,40 @@ export class Physics {
   }
 
   getFirstCollision(startPos, cellSize, delta, callback) {
-    let dirX = delta.x < 0 ? -1 : 1;
-    let dirY = delta.y < 0 ? -1 : 1;
-    let endPosX = startPos.x + delta.x;
-    let endPosY = startPos.y + delta.y;
+    let dir = {}, endPos = {}, cell = {}, timeStep = {}, time = {};
+    let dirs = ['x', 'y'];
+    let firstEdge = {};
 
-    let cellX = Math.floor(startPos.x / cellSize);
-    let cellY = Math.floor(startPos.y / cellSize);
-
-    let timeStepX = (cellSize * dirX) / delta.x;
-    let timeStepY = (cellSize * dirY) / delta.y;
-
-    let timeX, timeY;
-    if (dirX === 0) {
-      timeX = 1;
-    } else {
-      let firstEdgeX = cellX * cellSize;
-      if (dirX > 0) {
-        firstEdgeX += cellSize;
-      }
-      timeX = (firstEdgeX - startPos.x) / delta.x;
-    }
-
-    if (dirY === 0) {
-      timeY = 1;
-    } else {
-      let firstEdgeY = cellY * cellSize;
-      if (dirY > 0) {
-        firstEdgeY += cellSize;
-      }
-      timeY = (firstEdgeY - startPos.y) / delta.y;
-    }
-
-    while (timeX < 1 || timeY < 1) {
-      if (timeX < timeY) {
-        timeX += timeStepX;
-        cellX += dirX;
+    for(let i = 0; i < 2; i++){
+      let k = dirs[i];
+      dir[k] = delta[k] < 0 ? -1 : 1;
+      endPos[k] = startPos[k] + delta[k];
+      cell[k] = Math.floor(startPos[k] / cellSize);
+      timeStep[k] = (cellSize * dir[k]) / delta[k];
+      if (dir[k] === 0) {
+        time[k] = 1;
       } else {
-        cellY += dirY;
-        timeY += timeStepY;
+        firstEdge[k] = cell[k] * cellSize;
+        if (dir[k] > 0) {
+          firstEdge[k] += cellSize;
+        }
+        time[k] = (firstEdge[k] - startPos[k]) /
+                        delta[k];
       }
-      if (callback(cellX, cellY) === false) {
+    }
+
+    while (time.x < 1 || time.y < 1) {
+      if (time.x < time.y) {
+        time.x += timeStep.x;
+        cell.x += dir.x;
+      } else {
+        cell.y += dir.y;
+        time.y += timeStep.y;
+      }
+      if (callback(cell.x, cell.y) === false) {
         break;
       }
     }
-    // console.log(timeX, timeY);
-    // return {tsX: timeStepX, tsY: timeStepY};
   }
 
   checkNearestHit(sourceActor, staticResult, targetResult) {

@@ -8,11 +8,14 @@ export class Bullet extends Actor {
     var image = {w: 5, h: 5};
     super(image, startX, startY, 100, speed, speed, dirX, dirY);
     this.deathTimer = 0;
+    this.headLampActive = true;
+    this.headLampAngle = 180;
+    this.headLampPower = 280;
   }
 
   draw(game, elapsedTime) {
-    game.context.fillStyle = '#FFF';
-    game.context.fillRect(this.curX, this.curY, this.width, this.height);
+    game.contextFX.fillStyle = '#FFF';
+    game.contextFX.fillRect(this.curX, this.curY, this.width, this.height);
   }
 
   update(game, elapsedTime) {
