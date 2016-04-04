@@ -38,3 +38,13 @@ html, body {
   border: 0px solid #222;
   z-index: 30;
 }
+
+#fps {
+  position: absolute;
+  top: 10px;
+  width: 480px;
+  height: 240px;
+  right: 100px;
+  border: 2px solid #FFF;
+  z-index: 99;
+}

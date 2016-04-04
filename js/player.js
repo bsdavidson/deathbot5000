@@ -25,6 +25,8 @@ export class Player extends Actor{
     // let healthVis = ((100 - this.health) / 100);
     // game.context.fillStyle = 'rgba(0,0,0,' + healthVis + ')';
     // game.context.fillRect(0, 0, game.canvas.width, game.canvas.height);
+    this.drawFPS(game, elapsedTime);
+
   }
 
   update(game, elapsedTime) {

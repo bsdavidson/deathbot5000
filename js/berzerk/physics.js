@@ -25,7 +25,18 @@ export class Point {
   }
 }
 
+export class FPSPoint {
+  constructor(x, y, delta, angle) {
+    this.x = x;
+    this.y = y;
+    this.delta = delta;
+    this.angle = angle;
+  }
+}
+
 export const EPSILON = 1 / 32;
+export const DEG_TO_RAD = Math.PI / 180;
+export const RAD_TO_DEG = 180 / Math.PI;
 
 export class Physics {
   constructor(game) {
@@ -62,6 +73,19 @@ export class Physics {
 
   getDelta(x1, y1, x2, y2) {
     return {x: x2 - x1, y: y2 - y1};
+  }
+
+// distance = sqr((x1-x2)^2 + (y1-y2)^2)
+  getDistance(startPoint, endPoint) {
+    let deltaX = startPoint.x - endPoint.x;
+    let deltaY = startPoint.y - endPoint.y;
+    let distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+    if (!isNaN(distance)) {
+      return distance;
+    } else {
+      debugger;
+      return 0;
+    }
   }
 
   intersectSegmentIntoBox(segmentPos, segmentDelta, paddedBox, debug) {
@@ -249,7 +273,7 @@ export class Physics {
     let dirs = ['x', 'y'];
     let firstEdge = {};
 
-    for(let i = 0; i < 2; i++){
+    for (let i = 0; i < 2; i++) {
       let k = dirs[i];
       dir[k] = delta[k] < 0 ? -1 : 1;
       endPos[k] = startPos[k] + delta[k];
@@ -279,6 +303,47 @@ export class Physics {
         break;
       }
     }
+  }
+
+  sweepScan(game, initialEndpoint, startPoint, sweepCount, sweepAngle, cellSize, context) {
+    // let degreeToCurEndPoint;
+    let pointArray = [];
+    let initialDelta = this.getDelta(initialEndpoint.x,
+                                     initialEndpoint.y,
+                                     startPoint.x,
+                                     startPoint.y);
+    let degToInitialEndpos = this.getTargetDegree(initialDelta);
+    let degreeToStartSweep = degToInitialEndpos + (sweepAngle / 2);
+    // let degreeToEndSweep = degToInitialEndpos - sweepAngle;
+    // initialDelta = this.degToPos(degreeToStartSweep, context.laserRange);
+
+    // let endingEndPos;
+    let rayAngleStep = sweepAngle / sweepCount;
+    // degreeToCurEndPoint = degreeToStartSweep;
+
+    for (let i = 0; i < sweepCount; i++) {
+      let rayAngle = degreeToStartSweep - rayAngleStep * i;
+      // let xxx = degreeToCurEndPoint == degreeToStartSweep;
+      let endingDelta = this.degToPos(rayAngle, context.laserRange);
+      this.getFirstCollision(startPoint, cellSize, endingDelta,
+        (cellx, celly) => {
+          let gridPos = (celly * game.cols) + cellx;
+          let block = game.staticGrid[gridPos];
+          if (block) {
+            let endingResult = this.intersectSegmentIntoBox(
+              startPoint, endingDelta, block);
+            if (endingResult && endingResult.hit) {
+              let endingEndPos = new FPSPoint(
+                endingResult.hitPos.x, endingResult.hitPos.y,
+                this.getDistance(startPoint, endingResult.hitPos),
+                (-sweepAngle / 2) + (rayAngleStep * i)
+                );
+              pointArray.push(endingEndPos);
+              return false;
+            }}
+        });
+    }
+    return pointArray;
   }
 
   checkNearestHit(sourceActor, staticResult, targetResult) {
@@ -316,7 +381,7 @@ export class Physics {
 
   getTargetDegree(delta) {
     var theta = Math.atan2(delta.x, delta.y);
-    var degree = theta * (180 / Math.PI);
+    var degree = theta * RAD_TO_DEG;
     if (theta < 0) {
       degree += 360;
     }
@@ -324,7 +389,7 @@ export class Physics {
   }
 
   degToPos(degree, radius) {
-    var radian = degree * (Math.PI / 180);
+    var radian = degree * DEG_TO_RAD;
     var result = {
       x: radius * Math.sin(radian),
       y: radius * Math.cos(radian)

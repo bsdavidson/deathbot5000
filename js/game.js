@@ -17,21 +17,21 @@ export const LEVELS = [
       1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,
+      1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
+      1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,
-      1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
-      1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,
-      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
-      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,
-      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
-      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,
-      1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
+      1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,
       1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
-      1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+      1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     ]
   }
 ];
@@ -54,7 +54,7 @@ const CHARACTERS = [
 ];
 
 export class Game extends BerzerkGame {
-  constructor(canvas, canvasBG, fillStyle) {
+  constructor(canvas, canvasBG, canvasFPS, fillStyle) {
     super(canvas);
     this.playerDeathMethod = '';
     this.gameState = 'attract'; // attract, play, dead
@@ -75,10 +75,16 @@ export class Game extends BerzerkGame {
     this.canvasBG.width = window.innerWidth;
     this.canvasBG.height = window.innerHeight;
     this.contextBG = this.canvasBG.getContext('2d');
+
     this.canvasFX = document.querySelector('#fx');
     this.canvasFX.width = window.innerWidth;
     this.canvasFX.height = window.innerHeight;
     this.contextFX = this.canvasFX.getContext('2d');
+
+    this.canvasFPS = canvasFPS;
+    this.canvasFPS.width = 480;
+    this.canvasFPS.height = 240;
+    this.contextFPS = this.canvasFPS.getContext('2d');
     // this.contextFX.fillStyle = 'rgba(0, 0, 0, .50)';
     // this.contextFX.fillRect(0, 0, this.canvasFX.width, this.canvasFX.height);
     this.messageTime = 10;
@@ -344,9 +350,6 @@ export class Game extends BerzerkGame {
       } else {
         this.messageTime = 10;
         this.round++;
-        // Reviving monsters, this will be refactored later to randomize
-        // positions rather than just reactivating the dead ones where they
-        // fell.
         this.eachActor(function(actor) {
           if (actor instanceof Monster) {
             this.numOfMonsters++;

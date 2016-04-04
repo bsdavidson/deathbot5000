@@ -7,7 +7,7 @@ export class Game {
   constructor(canvas) {
     this.mouse = {x: 0, y: 0};
     this.initialized = false;
-    this.debugMode = false;
+    this.debugMode = true;
     this.images = {};
     this.imagesLoaded = false;
     this.actors = {};
@@ -131,12 +131,11 @@ export class Game {
     this.eachActor(function(actor) {
       actor.preDraw(this, elapsedTime);
     }, this);
-    this.context.globalCompositeOperation="source-atop";
+    this.context.globalCompositeOperation = 'source-atop';
     this.eachActor(function(actor) {
       actor.draw(this, elapsedTime);
     }, this);
-    this.context.globalCompositeOperation="source-over";
-
+    this.context.globalCompositeOperation = 'source-over';
   }
 
   drawLoading() {}

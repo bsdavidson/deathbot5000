@@ -15,7 +15,7 @@ export class Monster extends Actor {
     this.laserRange = 1200;
     this.laserStart = {};
     this.eyeOffset = {x: 0, y: 14};
-    this.headLampActive = true;
+    this.headLampActive = false;
   }
 
   draw(game, elapsedTime) {

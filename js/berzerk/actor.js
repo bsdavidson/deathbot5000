@@ -1,7 +1,7 @@
 /*jshint browser:true */
 'use strict';
 
-import {Physics, Box, Point, EPSILON} from './physics';
+import {Physics, Box, Point, EPSILON, DEG_TO_RAD} from './physics';
 
 export var Directions = {
   UP: 0,
@@ -202,7 +202,7 @@ export class Actor {
     }, this);
   }
 
-  headLamp(game, elapsedTime, angle = 45, power = 800) {
+  headLamp(game, elapsedTime, angle = 75, power = 800) {
     let pointArray = [];
     let startingPoint = {};
     let degreeToCurEndPoint;
@@ -226,40 +226,9 @@ export class Actor {
     // Using the Mouse
     // initialEndpoint = {x: (this.curX - game.mouse.x) * this.laserRange,
     //                    y: (this.curY - game.mouse.y) * this.laserRange};
-
-    let initialDelta = game.physics.getDelta(initialEndpoint.x,
-                                            initialEndpoint.y,
-                                            startingPoint.x,
-                                            startingPoint.y);
-    let degToInitialEndpos = game.physics.getTargetDegree(initialDelta);
-    let degreeToStartSweep = degToInitialEndpos - sweepAngle;
-    let degreeToEndSweep = degToInitialEndpos + sweepAngle;
-    initialDelta = game.physics.degToPos(degreeToStartSweep, this.laserRange);
-
-    let endingEndPos;
-    degreeToCurEndPoint = degreeToStartSweep;
-
-    while (degreeToCurEndPoint < degreeToEndSweep) {
-      let xxx = degreeToCurEndPoint == degreeToStartSweep;
-      degreeToCurEndPoint += 0.2;
-      let endingDelta = game.physics.degToPos(degreeToCurEndPoint,
-                                              this.laserRange);
-      game.physics.getFirstCollision(startingPoint, cellSize, endingDelta,
-        (cellx, celly) => {
-          let gridPos = (celly * game.cols) + cellx;
-          let block = game.staticGrid[gridPos];
-          if (block) {
-            let endingResult = game.physics.intersectSegmentIntoBox(
-              startingPoint, endingDelta, block);
-            if (endingResult && endingResult.hit) {
-              endingEndPos = new Point(
-              endingResult.hitPos.x, endingResult.hitPos.y);
-              pointArray.push(endingEndPos);
-              return false;
-            }}
-        });
-    }
-
+    pointArray = game.physics.sweepScan(game, initialEndpoint, startingPoint,
+                                        game.canvas.width, sweepAngle,
+                                        cellSize, this);
     let lightCtx = game.context;
     lightCtx.beginPath();
     lightCtx.moveTo(startingPoint.x, startingPoint.y);
@@ -320,6 +289,62 @@ export class Actor {
     }
   }
 
+
+
+  drawFPS(game, elapsedTime) {
+    game.contextFX.clearRect(0, 0, game.canvasFPS.width,
+                                   game.canvasFPS.height);
+    let bgColor = '#FFFFFF';
+    game.contextFPS.fillStyle = bgColor;
+    game.contextFPS.fillRect(0, 0, game.canvasFPS.width, game.canvasFPS.height);
+
+    game.contextFPS.fillStyle = "#000000";
+    game.contextFPS.fillRect(0, game.canvasFPS.height / 2, game.canvasFPS.width, game.canvasFPS.height / 2);
+
+    let pointArray = [];
+    let startingPoint = {};
+    let degreeToCurEndPoint;
+    let sweepAngle = 60;
+    let resolution = 320;
+    let projectionDistance = (game.canvasFPS.width / 2) *
+                             Math.tan(sweepAngle * DEG_TO_RAD);
+    let gridSize = {w: 28, h: 28};
+    let cellSize = 32;
+    let dir = {x: this.dirX, y: this.dirY};
+
+    startingPoint.x = this.curX + (this.width / 2);
+    startingPoint.y = this.curY + 14;
+    let initialEndpoint = {};
+    // Get our initial point that is straight ahead
+    if (this.dirX === -1 || this.dirX === 1) {
+      initialEndpoint = {x: (startingPoint.x + this.laserRange) * -this.dirX,
+                         y: startingPoint.y};
+    } else if (this.dirY === -1 || this.dirY === 1) {
+      initialEndpoint = {x: startingPoint.x,
+                        y: (startingPoint.y + this.laserRange) * -this.dirY};
+    }
+    pointArray = game.physics.sweepScan(game, initialEndpoint, startingPoint,
+                                        game.canvasFPS.width, sweepAngle, cellSize, this);
+    for (let i = 0; i < pointArray.length; i++) {
+      let z = pointArray[i].delta * Math.cos(pointArray[i].angle * DEG_TO_RAD);
+      let distanceAlpha = pointArray[i].delta / 800;
+      let wallHeight = game.canvasFPS.height * (64 / z);
+      // let wallHeight = (32 / z) * projectionDistance;
+      // if (wallHeight > game.canvasFPS.height) {
+        // wallHeight = game.canvasFPS.height;
+      // }
+      let distanceColor = Math.floor(255 * (1.0 - distanceAlpha));
+      // game.contextFPS.fillStyle = `rgba(0, 0, 0, ${distanceAlpha})`;
+      game.contextFPS.fillStyle = `rgb(${distanceColor},${distanceColor},${distanceColor})`;
+      game.contextFPS.fillRect(
+        i,
+        (game.canvasFPS.height - wallHeight) / 2,
+        1,
+        wallHeight
+        );
+    }
+  }
+
   draw(game, elapsedTime) {
     if (this.curImage) {
       // console.log(this.curImage);
@@ -358,6 +383,7 @@ export class Actor {
       }
       game.context.drawImage(this.curImage, this.curX, this.curY,
         this.width, this.height);
+
     }
 
     if (game.debugMode) {
