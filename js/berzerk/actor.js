@@ -208,7 +208,7 @@ export class Actor {
     let degreeToCurEndPoint;
     let sweepAngle = angle;
     let gridSize = {w: 28, h: 28};
-    let cellSize = 32;
+    let cellSize = game.cellWidth;
     let dir = {x: this.dirX, y: this.dirY};
 
     startingPoint.x = this.curX + (this.width / 2);
@@ -289,8 +289,6 @@ export class Actor {
     }
   }
 
-
-
   drawFPS(game, elapsedTime) {
     game.contextFX.clearRect(0, 0, game.canvasFPS.width,
                                    game.canvasFPS.height);
@@ -298,8 +296,9 @@ export class Actor {
     game.contextFPS.fillStyle = bgColor;
     game.contextFPS.fillRect(0, 0, game.canvasFPS.width, game.canvasFPS.height);
 
-    game.contextFPS.fillStyle = "#000000";
-    game.contextFPS.fillRect(0, game.canvasFPS.height / 2, game.canvasFPS.width, game.canvasFPS.height / 2);
+    game.contextFPS.fillStyle = '#000000';
+    game.contextFPS.fillRect(0, game.canvasFPS.height / 2,
+                             game.canvasFPS.width, game.canvasFPS.height / 2);
 
     let pointArray = [];
     let startingPoint = {};
@@ -309,7 +308,7 @@ export class Actor {
     let projectionDistance = (game.canvasFPS.width / 2) *
                              Math.tan(sweepAngle * DEG_TO_RAD);
     let gridSize = {w: 28, h: 28};
-    let cellSize = 32;
+    let cellSize = game.cellWidth;
     let dir = {x: this.dirX, y: this.dirY};
 
     startingPoint.x = this.curX + (this.width / 2);
@@ -324,18 +323,17 @@ export class Actor {
                         y: (startingPoint.y + this.laserRange) * -this.dirY};
     }
     pointArray = game.physics.sweepScan(game, initialEndpoint, startingPoint,
-                                        game.canvasFPS.width, sweepAngle, cellSize, this);
+                                        game.canvasFPS.width, sweepAngle,
+                                        cellSize, this);
     for (let i = 0; i < pointArray.length; i++) {
       let z = pointArray[i].delta * Math.cos(pointArray[i].angle * DEG_TO_RAD);
       let distanceAlpha = pointArray[i].delta / 800;
       let wallHeight = game.canvasFPS.height * (64 / z);
-      // let wallHeight = (32 / z) * projectionDistance;
-      // if (wallHeight > game.canvasFPS.height) {
-        // wallHeight = game.canvasFPS.height;
-      // }
-      let distanceColor = Math.floor(255 * (1.0 - distanceAlpha));
+      let distanceColor = Math.floor(200 * (1.0 - distanceAlpha));
       // game.contextFPS.fillStyle = `rgba(0, 0, 0, ${distanceAlpha})`;
-      game.contextFPS.fillStyle = `rgb(${distanceColor},${distanceColor},${distanceColor})`;
+      game.contextFPS.fillStyle = `rgb(${distanceColor},
+                                   ${distanceColor},
+                                   ${distanceColor})`;
       game.contextFPS.fillRect(
         i,
         (game.canvasFPS.height - wallHeight) / 2,
@@ -383,7 +381,6 @@ export class Actor {
       }
       game.context.drawImage(this.curImage, this.curX, this.curY,
         this.width, this.height);
-
     }
 
     if (game.debugMode) {

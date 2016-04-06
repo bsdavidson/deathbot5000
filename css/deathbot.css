@@ -41,10 +41,10 @@ html, body {
 
 #fps {
   position: absolute;
-  top: 10px;
+  bottom: 10px;
   width: 480px;
   height: 240px;
-  right: 100px;
+  right: 10px;
   border: 2px solid #FFF;
   z-index: 99;
 }

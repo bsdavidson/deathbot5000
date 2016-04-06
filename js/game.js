@@ -49,7 +49,7 @@ const CHARACTERS = [
     name: 'player',
     image: 'img/player.png',
     w: 28,
-    h: 52
+    h: 28
   }
 ];
 

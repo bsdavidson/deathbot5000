@@ -13,6 +13,8 @@ export class Player extends Actor{
     this.recoveryTimer = 2;
     this.eyeOffset = {x: 0, y: 10};
     this.headLampActive = true;
+    this.headLampAngle = 362;
+    this.headLampPower = 280;
   }
 
   draw(game, elapsedTime) {
@@ -26,7 +28,6 @@ export class Player extends Actor{
     // game.context.fillStyle = 'rgba(0,0,0,' + healthVis + ')';
     // game.context.fillRect(0, 0, game.canvas.width, game.canvas.height);
     this.drawFPS(game, elapsedTime);
-
   }
 
   update(game, elapsedTime) {
@@ -169,7 +170,6 @@ export class Player extends Actor{
     // console.log(this.curX, this.curY);
     // this.headLamp(game, elapsedTime);
   }
-
   // startX, startY, speed, dirX, dirY
   fireBullet(game, dirX, dirY) {
     this.bullet = new Bullet(this.curX, this.curY + 20, 600, dirX, dirY);

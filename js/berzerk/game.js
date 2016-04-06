@@ -7,7 +7,7 @@ export class Game {
   constructor(canvas) {
     this.mouse = {x: 0, y: 0};
     this.initialized = false;
-    this.debugMode = true;
+    this.debugMode = false;
     this.images = {};
     this.imagesLoaded = false;
     this.actors = {};

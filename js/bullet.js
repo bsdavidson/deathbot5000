@@ -9,7 +9,7 @@ export class Bullet extends Actor {
     super(image, startX, startY, 100, speed, speed, dirX, dirY);
     this.deathTimer = 0;
     this.headLampActive = true;
-    this.headLampAngle = 180;
+    this.headLampAngle = 362;
     this.headLampPower = 280;
   }
 
